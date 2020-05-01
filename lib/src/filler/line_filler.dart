@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:rough/src/filler/scan_line_hachure.dart';
 
 import '../core.dart';
-import '../generator.dart';
 import '../renderer.dart';
 
 class IntersectionInfo {
@@ -158,5 +157,43 @@ class DashedFiller {
       }
     });
     return ops;
+  }
+}
+
+class DotFiller {
+  OpSet fill(List<PointD> points, Options o) {
+    o = o.copyWith(curveStepCount: 4, hachureAngle: 0, roughness: 1);
+    List<Line> lines = polygonHachureLines(points, o);
+    return dotsOnLines(lines, o);
+  }
+
+  OpSet dotsOnLines(List<Line> lines, Options o) {
+    List<Op> ops = [];
+    double gap = o.hachureGap;
+    if (gap < 0) {
+      gap = o.strokeWidth * 4;
+    }
+    gap = max(gap, 0.1);
+    double fweight = o.fillWeight;
+    if (fweight < 0) {
+      fweight = o.strokeWidth / 2;
+    }
+    double ro = gap / 4;
+    lines.forEach((line) {
+      double length = line.length;
+      double dl = length / gap;
+      int count = dl.ceil() - 1;
+      double off = length - (count * gap);
+      double x = ((line.source.x + line.target.x) / 2) - (gap / 4);
+      double minY = min(line.source.y, line.target.y);
+      for (int i = 0; i < count; i++) {
+        double y = minY + off + (i * gap);
+        double cx = offset(x - ro, x + ro, o, 1);
+        double cy = offset(y - ro, y + ro, o, 1);
+        OpSet el = ellipse(cx, cy, fweight, fweight, o);
+        ops.addAll(el.ops);
+      }
+    });
+    return OpSet(type: OpSetType.fillSketch, ops: ops);
   }
 }

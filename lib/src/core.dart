@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'Randomizer.dart';
-import 'generator.dart';
 import 'geometry.dart';
 
 class Config {
@@ -182,5 +181,37 @@ class Line {
 
   bool isMidPointInPolygon(List<Point> polygon) {
     return PointD((source.x + target.x) / 2, (source.y + target.y) / 2).isInPolygon(polygon);
+  }
+}
+
+class PointD extends Point<double> {
+  PointD(double x, double y) : super(x, y);
+
+  bool isInPolygon(List<Point> points) {
+    int vertices = points.length;
+
+    // There must be at least 3 vertices in polygon
+    if (vertices < 3) {
+      return false;
+    }
+    PointD extreme = PointD(double.maxFinite, y);
+    int count = 0;
+    for (int i = 0; i < vertices; i++) {
+      Point current = points[i];
+      Point next = points[(i + 1) % vertices];
+      if (Line(current, next).intersects(Line(this, extreme))) {
+        if (getOrientation(current, this, next) == Orient.collinear) {
+          return Line(current, next).onSegment(this);
+        }
+        count++;
+      }
+    }
+    // true if count is off
+    return count % 2 == 1;
+  }
+
+  @override
+  String toString() {
+    return 'PointD{x:$x, y:$y}';
   }
 }

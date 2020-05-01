@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:rough/src/core.dart';
-import 'package:rough/src/generator.dart';
 
 List<PointD> rotatePoints(List<PointD> points, PointD center, double degrees) {
   if (points != null && points.isNotEmpty) {

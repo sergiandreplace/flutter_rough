@@ -1,11 +1,10 @@
 import 'dart:math';
 
 import '../core.dart';
-import '../generator.dart';
 import '../geometry.dart';
 
 List<Line> polygonHachureLines(List<PointD> points, Options o) {
-  PointD rotationCenter = getCenter(points);
+  PointD rotationCenter = PointD(0, 0);
   double angle = (o.hachureAngle + 90).roundToDouble();
   if (angle != 0) {
     points = rotatePoints(points, rotationCenter, angle);
