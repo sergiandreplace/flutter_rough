@@ -1,124 +1,44 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:rough/src/config.dart';
 
-import 'Randomizer.dart';
 import 'geometry.dart';
-
-class Config {
-  final Options options;
-
-  Config(this.options);
-}
-
-class Options {
-  double maxRandomnessOffset;
-  double roughness;
-  double bowing;
-  Color stroke;
-  double strokeWidth;
-  double curveFitting;
-  double curveTightness;
-  double curveStepCount;
-  Color fill;
-  double fillWeight;
-  double hachureAngle;
-  double hachureGap;
-  double simplification;
-  double dashOffset;
-  double dashGap;
-  double zigzagOffset;
-  int seed;
-  bool combineNestedSvgPaths;
-  Random _randomizer;
-
-  Options({
-    this.maxRandomnessOffset = 2,
-    this.roughness = 1,
-    this.bowing = 1,
-    this.stroke = Colors.black,
-    this.strokeWidth = 1,
-    this.curveFitting = 0.95,
-    this.curveTightness = 0,
-    this.curveStepCount = 9,
-    this.fill = Colors.red,
-    this.fillWeight = -1,
-    this.hachureAngle = -41,
-    this.hachureGap = 10,
-    this.simplification = 0,
-    this.dashOffset = -1,
-    this.dashGap = -1,
-    this.zigzagOffset = -1,
-    this.seed = 0,
-    this.combineNestedSvgPaths = false,
-  });
-
-  Randomizer get randomizer => Randomizer(seed: this.seed);
-
-  copyWith({
-    double maxRandomnessOffset,
-    double roughness,
-    double bowing,
-    Color stroke,
-    double strokeWidth,
-    double curveFitting,
-    double curveTightness,
-    double curveStepCount,
-    Color fill,
-    double fillWeight,
-    double hachureAngle,
-    double hachureGap,
-    double simplification,
-    double dashOffset,
-    double dashGap,
-    double zigzagOffset,
-    int seed,
-    bool combineNestedSvgPaths,
-  }) =>
-      Options(
-        maxRandomnessOffset: maxRandomnessOffset ?? this.maxRandomnessOffset,
-        roughness: roughness ?? this.roughness,
-        bowing: bowing ?? this.bowing,
-        stroke: stroke ?? this.stroke,
-        strokeWidth: strokeWidth ?? this.strokeWidth,
-        curveFitting: curveFitting ?? this.curveFitting,
-        curveTightness: curveTightness ?? this.curveTightness,
-        curveStepCount: curveStepCount ?? this.curveStepCount,
-        fill: fill ?? this.fill,
-        fillWeight: fillWeight ?? this.fillWeight,
-        hachureAngle: hachureAngle ?? this.hachureAngle,
-        hachureGap: hachureGap ?? this.hachureGap,
-        simplification: simplification ?? this.simplification,
-        dashOffset: dashOffset ?? this.dashOffset,
-        dashGap: dashGap ?? this.dashGap,
-        zigzagOffset: zigzagOffset ?? this.zigzagOffset,
-        seed: seed ?? this.seed,
-        combineNestedSvgPaths: combineNestedSvgPaths ?? this.combineNestedSvgPaths,
-      );
-}
 
 class Op {
   final OpType op;
-  final List<double> data;
+  final List<Point> data;
 
-  Op(this.op, this.data);
+  Op._(this.op, this.data);
+
+  Op.move(Point point)
+      : this.op = OpType.move,
+        this.data = [point];
+
+  Op.lineTo(Point point)
+      : this.op = OpType.lineTo,
+        this.data = [point];
+
+  Op.curveTo(Point control1, Point control2, Point destination)
+      : this.op = OpType.curveTo,
+        this.data = [control1, control2, destination];
 }
 
 class OpSet {
   OpSetType type;
   List<Op> ops;
+
   OpSet({this.type, this.ops});
 }
 
 class Drawable {
   String shape;
-  Options options;
+  DrawConfig options;
   List<OpSet> sets;
 
   Drawable({this.shape, this.options, this.sets});
 }
 
-enum OpType { move, bCurveTo, lineTo }
+enum OpType { move, curveTo, lineTo }
 enum OpSetType { path, fillPath, fillSketch }
 
 class Line {
