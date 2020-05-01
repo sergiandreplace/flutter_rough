@@ -85,32 +85,33 @@ class RoughPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     Random r = Random();
     int max = 30;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 60; i++) {
       double x = r.nextDouble() * (size.width);
       double y = r.nextDouble() * (size.height);
       double w = r.nextDouble() * 30 + 50;
       double h = r.nextDouble() * 30 + 50;
       Options o = Options(
         roughness: r.nextDouble() * 3,
-        maxRandomnessOffset: 1,
+        maxRandomnessOffset: 2,
         bowing: r.nextDouble() * 20,
-        curveFitting: r.nextDouble() * 0.2 + 1,
-        curveStepCount: r.nextDouble() * 10 + 2,
-        curveTightness: r.nextDouble() * 1,
+        curveFitting: r.nextDouble() * 1,
+        curveStepCount: r.nextDouble() * 5,
+        curveTightness: r.nextDouble() * 5,
         stroke: Colors.primaries[r.nextInt(Colors.primaries.length)].withOpacity(r.nextDouble()),
         strokeWidth: r.nextDouble() * 0.5 + 1,
-        fillStyle: 'lotuyo',
         hachureAngle: r.nextDouble() * 180,
-        hachureGap: r.nextDouble() * 10 + 2,
+        hachureGap: r.nextDouble() * 10 + 8,
         dashGap: 10,
         seed: 3,
       );
-      if (r.nextInt(1) == 0) {
+      if (r.nextInt(2) == 1) {
         draw(canvas, generator.circle(x, y, w * 2, options: o));
       } else {
         draw(canvas, generator.rectangle(x - w / 2, y - h / 2, w, h, options: o));
       }
     }
+//    double s = 300;
+//    draw(canvas, generator.rectangle((size.width - s) / 2, (size.height - s) / 2, s, s));
   }
 
   @override

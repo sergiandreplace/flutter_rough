@@ -22,7 +22,6 @@ class Options {
   double curveTightness;
   double curveStepCount;
   Color fill;
-  String fillStyle;
   double fillWeight;
   double hachureAngle;
   double hachureGap;
@@ -44,7 +43,6 @@ class Options {
     this.curveTightness = 0,
     this.curveStepCount = 9,
     this.fill = Colors.red,
-    this.fillStyle = 'hachure',
     this.fillWeight = -1,
     this.hachureAngle = -41,
     this.hachureGap = 10,
@@ -57,6 +55,47 @@ class Options {
   });
 
   Randomizer get randomizer => Randomizer(seed: this.seed);
+
+  copyWith({
+    double maxRandomnessOffset,
+    double roughness,
+    double bowing,
+    Color stroke,
+    double strokeWidth,
+    double curveFitting,
+    double curveTightness,
+    double curveStepCount,
+    Color fill,
+    double fillWeight,
+    double hachureAngle,
+    double hachureGap,
+    double simplification,
+    double dashOffset,
+    double dashGap,
+    double zigzagOffset,
+    int seed,
+    bool combineNestedSvgPaths,
+  }) =>
+      Options(
+        maxRandomnessOffset: maxRandomnessOffset ?? this.maxRandomnessOffset,
+        roughness: roughness ?? this.roughness,
+        bowing: bowing ?? this.bowing,
+        stroke: stroke ?? this.stroke,
+        strokeWidth: strokeWidth ?? this.strokeWidth,
+        curveFitting: curveFitting ?? this.curveFitting,
+        curveTightness: curveTightness ?? this.curveTightness,
+        curveStepCount: curveStepCount ?? this.curveStepCount,
+        fill: fill ?? this.fill,
+        fillWeight: fillWeight ?? this.fillWeight,
+        hachureAngle: hachureAngle ?? this.hachureAngle,
+        hachureGap: hachureGap ?? this.hachureGap,
+        simplification: simplification ?? this.simplification,
+        dashOffset: dashOffset ?? this.dashOffset,
+        dashGap: dashGap ?? this.dashGap,
+        zigzagOffset: zigzagOffset ?? this.zigzagOffset,
+        seed: seed ?? this.seed,
+        combineNestedSvgPaths: combineNestedSvgPaths ?? this.combineNestedSvgPaths,
+      );
 }
 
 class Op {
@@ -69,10 +108,7 @@ class Op {
 class OpSet {
   OpSetType type;
   List<Op> ops;
-  Point size;
-  String path;
-
-  OpSet({this.type, this.ops, this.size, this.path});
+  OpSet({this.type, this.ops});
 }
 
 class Drawable {

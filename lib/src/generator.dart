@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:rough/src/filler/hachure_filler.dart';
+import 'package:rough/src/filler/line_filler.dart';
 import 'package:rough/src/geometry.dart';
 import 'package:rough/src/renderer.dart';
 
@@ -25,7 +25,7 @@ class Generator {
 //      if (o.fillStyle === 'solid') {
 //        paths.push(solidFillPolygon(points, o));
 //      } else {
-    paths.add(HachureFiller().fillPolygon(points, o));
+    paths.add(ZigZagFiller().fill(points, o));
 //      }
 //    }
 //if (o.stroke !== NOS) {
@@ -45,13 +45,13 @@ class Generator {
     EllipseParams ellipseParams = generateEllipseParams(width, height, o);
     EllipseResult ellipseResponse = ellipseWithParams(x, y, o, ellipseParams);
     if (o.fill != null) {
-      if (o.fillStyle == 'solid') {
-        OpSet shape = ellipseResponse.opset;
-        shape.type = OpSetType.fillPath;
-        paths.add(shape);
-      } else {
-        paths.add(HachureFiller().fillPolygon(ellipseResponse.estimatedPoints, o));
-      }
+//      if (o.fillStyle == 'solid') {
+//        OpSet shape = ellipseResponse.opset;
+//        shape.type = OpSetType.fillPath;
+//        paths.add(shape);
+//      } else {
+      paths.add(HatchFiller().fill(ellipseResponse.estimatedPoints, o));
+//      }
     }
     if (o.stroke != null) {
       paths.add(ellipseResponse.opset);
@@ -200,7 +200,7 @@ class PointD extends Point<double> {
     if (vertices < 3) {
       return false;
     }
-    Point extreme = Point(double.maxFinite, y);
+    PointD extreme = PointD(double.maxFinite, y);
     int count = 0;
     for (int i = 0; i < vertices; i++) {
       Point current = points[i];
