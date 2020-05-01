@@ -13,28 +13,7 @@ class IntersectionInfo {
   IntersectionInfo({this.point, this.distance});
 }
 
-class HachureFiller extends _LineFiller {
-  OpSet fill(List<PointD> points, Options o) {
-    return fillPolygon(points, o, false);
-  }
-}
-
-class ZigZagFiller extends _LineFiller {
-  OpSet fill(List<PointD> points, Options o) {
-    return fillPolygon(points, o, true);
-  }
-}
-
-class HatchFiller extends _LineFiller {
-  OpSet fill(List<PointD> points, Options o) {
-    OpSet set1 = fillPolygon(points, o, false);
-    Options rotated = o.copyWith(hachureAngle: o.hachureAngle + 90);
-    OpSet set2 = fillPolygon(points, rotated, false);
-    return OpSet(type: OpSetType.fillSketch, ops: set1.ops + set2.ops);
-  }
-}
-
-class _LineFiller {
+abstract class _LineFiller {
   OpSet fillPolygon(List<PointD> points, Options o, bool connectEnds) {
     List<Line> lines = polygonHachureLines(points, o);
     if (connectEnds) {
@@ -118,6 +97,65 @@ class _LineFiller {
     List<Op> ops = [];
     lines.forEach((line) {
       ops.addAll(doubleLine(line.source.x, line.source.y, line.target.x, line.target.y, o));
+    });
+    return ops;
+  }
+}
+
+class HachureFiller extends _LineFiller {
+  OpSet fill(List<PointD> points, Options o) {
+    return fillPolygon(points, o, false);
+  }
+}
+
+class ZigZagFiller extends _LineFiller {
+  OpSet fill(List<PointD> points, Options o) {
+    return fillPolygon(points, o, true);
+  }
+}
+
+class HatchFiller extends _LineFiller {
+  OpSet fill(List<PointD> points, Options o) {
+    OpSet set1 = fillPolygon(points, o, false);
+    Options rotated = o.copyWith(hachureAngle: o.hachureAngle + 90);
+    OpSet set2 = fillPolygon(points, rotated, false);
+    return OpSet(type: OpSetType.fillSketch, ops: set1.ops + set2.ops);
+  }
+}
+
+class DashedFiller {
+  OpSet fill(List<PointD> points, Options o) {
+    List<Line> lines = polygonHachureLines(points, o);
+    return OpSet(type: OpSetType.fillSketch, ops: dashedLines(lines, o));
+  }
+
+  List<Op> dashedLines(List<Line> lines, Options o) {
+    double offset = o.dashOffset < 0 ? (o.hachureGap < 0 ? (o.strokeWidth * 4) : o.hachureGap) : o.dashOffset;
+    double gap = o.dashGap < 0 ? (o.hachureGap < 0 ? (o.strokeWidth * 4) : o.hachureGap) : o.dashGap;
+    List<Op> ops = [];
+    lines.forEach((line) {
+      double length = line.length;
+      int count = (length / (offset + gap)).floor();
+      double lineOffset = (length + gap - (count * (offset + gap))) / 2;
+      PointD lineStart = line.source;
+      PointD lineEnd = line.target;
+      if (lineStart.x > lineEnd.x) {
+        lineStart = line.target;
+        lineEnd = line.source;
+      }
+      double alpha = atan((lineEnd.y - lineStart.y) / (lineEnd.x - lineStart.x));
+      for (int i = 0; i < count; i++) {
+        double segmentStartOffset = i * (offset + gap);
+        double segmentEndOffset = segmentStartOffset + offset;
+        var segmentStartX = lineStart.x + (segmentStartOffset * cos(alpha)) + (lineOffset * cos(alpha));
+        var segmentStartY = lineStart.y + segmentStartOffset * sin(alpha) + (lineOffset * sin(alpha));
+        PointD gapStart = PointD(segmentStartX, segmentStartY);
+        var segmentEndX = lineStart.x + (segmentEndOffset * cos(alpha)) + (lineOffset * cos(alpha));
+        var segmentEndY = lineStart.y + (segmentEndOffset * sin(alpha)) + (lineOffset * sin(alpha));
+        PointD gapEnd = PointD(segmentEndX, segmentEndY);
+
+        ops.addAll(doubleLine(gapStart.x, gapStart.y, gapEnd.x, gapEnd.y, o));
+      }
     });
     return ops;
   }

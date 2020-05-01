@@ -25,7 +25,7 @@ class Generator {
 //      if (o.fillStyle === 'solid') {
 //        paths.push(solidFillPolygon(points, o));
 //      } else {
-    paths.add(ZigZagFiller().fill(points, o));
+    paths.add(DashedFiller().fill(points, o));
 //      }
 //    }
 //if (o.stroke !== NOS) {

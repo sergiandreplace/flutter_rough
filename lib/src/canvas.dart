@@ -101,10 +101,11 @@ class RoughPainter extends CustomPainter {
         strokeWidth: r.nextDouble() * 0.5 + 1,
         hachureAngle: r.nextDouble() * 180,
         hachureGap: r.nextDouble() * 10 + 8,
-        dashGap: 10,
+        dashOffset: 10,
+        dashGap: 3,
         seed: 3,
       );
-      if (r.nextInt(2) == 1) {
+      if (r.nextInt(2) == 99) {
         draw(canvas, generator.circle(x, y, w * 2, options: o));
       } else {
         draw(canvas, generator.rectangle(x - w / 2, y - h / 2, w, h, options: o));
