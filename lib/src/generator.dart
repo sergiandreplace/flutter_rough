@@ -43,4 +43,9 @@ class Generator {
   Drawable linearPath(List<PointD> points) {
     return _buildDrawable(OpSetBuilder.linearPath(points, false, config));
   }
+
+  Drawable polygon(List<PointD> points) {
+    var path = OpSetBuilder.linearPath(points, true, config);
+    return _buildDrawable(path, points);
+  }
 }

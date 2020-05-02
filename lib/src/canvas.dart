@@ -12,6 +12,7 @@ class RoughCanvas extends StatelessWidget {
   final DrawConfig options;
 
   const RoughCanvas({Key key, this.options}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
@@ -22,25 +23,6 @@ class RoughCanvas extends StatelessWidget {
 }
 
 class RoughPainter extends CustomPainter {
-  var colors = <Color>[
-    Colors.black,
-    Colors.black54,
-    Colors.black87,
-  ];
-
-  Paint stroke = Paint()
-    ..strokeWidth = 1
-    ..isAntiAlias = true
-    ..color = Colors.black
-    ..strokeCap = StrokeCap.square
-    ..style = PaintingStyle.stroke;
-
-  Paint debug = Paint()
-    ..strokeWidth = 1
-    ..isAntiAlias = true
-    ..color = Colors.red
-    ..style = PaintingStyle.stroke;
-
   _drawToContext(Canvas canvas, OpSet drawing, Paint paint) {
     Path path = Path();
     drawing.ops.forEach((item) {
@@ -62,8 +44,6 @@ class RoughPainter extends CustomPainter {
 
   draw(Canvas canvas, Drawable drawable, Paint pathPaint, Paint fillPaint) {
     final sets = drawable.sets ?? [];
-    pathPaint.color = Colors.primaries[Random().nextInt(Colors.primaries.length)].withOpacity(Random().nextDouble());
-    fillPaint.color = Colors.primaries[Random().nextInt(Colors.primaries.length)].withOpacity(Random().nextDouble());
     sets.forEach((drawing) {
       switch (drawing.type) {
         case OpSetType.path:
@@ -79,24 +59,52 @@ class RoughPainter extends CustomPainter {
     });
   }
 
+  Paint stroke = Paint()
+    ..strokeWidth = 2
+    ..isAntiAlias = true
+    ..color = Colors.blueAccent
+    ..strokeCap = StrokeCap.square
+    ..style = PaintingStyle.stroke;
+
+  Paint fillPaint = Paint()
+    ..strokeWidth = 1
+    ..isAntiAlias = true
+    ..color = Colors.lightBlueAccent
+    ..style = PaintingStyle.stroke;
+
   @override
   void paint(Canvas canvas, Size size) {
     Random r = Random();
 
     DrawConfig config = DrawConfig(
-      roughness: r.nextDouble() * 3,
-      maxRandomnessOffset: 2,
-      bowing: r.nextDouble() * 20,
-      curveFitting: r.nextDouble() * 1,
-      curveStepCount: r.nextDouble() * 5,
-      curveTightness: r.nextDouble() + 0.5,
+      roughness: 1,
+      maxRandomnessOffset: 1.2,
+      bowing: 8,
+      curveFitting: 5,
+      curveStepCount: 5,
+      curveTightness: 1,
       seed: 3,
     );
 
-    double s = 300;
-    Generator squareGenerator = Generator(config, ZigZagFiller());
+    FillerConfig fillerConfig = FillerConfig(
+      hachureAngle: -40,
+      dashGap: 5,
+      dashOffset: 3,
+      drawConfig: config.copyWith(maxRandomnessOffset: 10, bowing: 0, curveFitting: 0.1, roughness: 0.8),
+      fillWeight: 10,
+      hachureGap: 2.5,
+      zigzagOffset: 1,
+    );
 
-    draw(canvas, squareGenerator.rectangle((size.width - s) / 2, (size.height - s) / 2, s, s), stroke, debug);
+    Generator gen = Generator(config, ZigZagFiller(fillerConfig));
+    canvas.scale(2);
+    canvas.translate(11, 46);
+    draw(canvas, gen.polygon([PointD(37.7, 128.9), PointD(9.8, 101), PointD(100.4, 10.4), PointD(156.2, 10.4)]), stroke, fillPaint);
+    canvas.translate(-4, -4);
+
+    draw(canvas, gen.polygon([PointD(156.2, 94), PointD(100.4, 94), PointD(50.7, 141.9), PointD(79.5, 170.7)]), stroke, fillPaint);
+    canvas.translate(6, 6);
+    draw(canvas, gen.polygon([PointD(79.5, 170.7), PointD(100.4, 191.6), PointD(156.2, 191.6), PointD(107.4, 142.8)]), stroke, fillPaint);
   }
 
   @override

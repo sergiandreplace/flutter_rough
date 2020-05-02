@@ -17,7 +17,6 @@ enum FillStyle { fill, sketch }
 class FillerConfig {
   final DrawConfig drawConfig;
   final double fillWeight;
-  final FillStyle fillStyle;
   final double hachureAngle;
   final double hachureGap;
   final double dashOffset;
@@ -27,7 +26,6 @@ class FillerConfig {
   const FillerConfig({
     this.drawConfig = const DrawConfig(),
     this.fillWeight = 1,
-    this.fillStyle = FillStyle.sketch,
     this.hachureAngle = -41,
     this.hachureGap = 15,
     this.dashOffset = 15,
@@ -38,7 +36,6 @@ class FillerConfig {
   FillerConfig copyWith({
     DrawConfig drawConfig,
     double fillWeight,
-    FillStyle fillStyle,
     double hachureAngle,
     double hachureGap,
     double dashOffset,
@@ -48,7 +45,6 @@ class FillerConfig {
       FillerConfig(
         drawConfig: drawConfig ?? this.drawConfig,
         fillWeight: fillWeight ?? this.fillWeight,
-        fillStyle: fillStyle ?? this.fillStyle,
         hachureAngle: hachureAngle ?? this.hachureAngle,
         hachureGap: hachureGap ?? this.hachureGap,
         dashOffset: dashOffset ?? this.dashOffset,
@@ -161,6 +157,15 @@ abstract class Filler {
       }
     }
     return lines;
+  }
+}
+
+class NoFiller extends Filler {
+  NoFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
+  @override
+  OpSet fill(List<PointD> points) {
+    return OpSet(type: OpSetType.fillSketch, ops: []);
   }
 }
 
