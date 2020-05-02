@@ -55,32 +55,32 @@ class Line {
       point.y >= min(source.y, target.y));
 
   bool intersects(Line line) {
-    Orient o1 = getOrientation(source, target, line.source);
-    Orient o2 = getOrientation(source, target, line.target);
-    Orient o3 = getOrientation(line.source, line.target, source);
-    Orient o4 = getOrientation(line.source, line.target, target);
+    PointsOrientation o1 = getOrientation(source, target, line.source);
+    PointsOrientation o2 = getOrientation(source, target, line.target);
+    PointsOrientation o3 = getOrientation(line.source, line.target, source);
+    PointsOrientation o4 = getOrientation(line.source, line.target, target);
 
     if (o1 != o2 && o3 != o4) {
       return true;
     }
     // source, target and line.source are colinear and line.source lies on segment this.source-this.target
 
-    if (o1 == Orient.collinear && onSegmentPoints(this.source, line.source, this.target)) {
+    if (o1 == PointsOrientation.collinear && onSegmentPoints(this.source, line.source, this.target)) {
       return true;
     }
 
     // this.source, this.target and line.source are collinear and line.target lies on segment this.source-this.target
-    if (o2 == Orient.collinear && onSegmentPoints(this.source, line.target, this.target)) {
+    if (o2 == PointsOrientation.collinear && onSegmentPoints(this.source, line.target, this.target)) {
       return true;
     }
 
     // line.source, line.target and this.source are collinear and this.source lies on segment line.source-line.target
-    if (o3 == Orient.collinear && onSegmentPoints(line.source, this.source, line.target)) {
+    if (o3 == PointsOrientation.collinear && onSegmentPoints(line.source, this.source, line.target)) {
       return true;
     }
 
     // line.source, line.target and this.target are collinear and this.target lies on segment line.source-line.target
-    if (o4 == Orient.collinear && onSegmentPoints(line.source, this.target, line.target)) {
+    if (o4 == PointsOrientation.collinear && onSegmentPoints(line.source, this.target, line.target)) {
       return true;
     }
     return false;
@@ -120,7 +120,7 @@ class PointD extends Point<double> {
       Point current = points[i];
       Point next = points[(i + 1) % vertices];
       if (Line(current, next).intersects(Line(this, extreme))) {
-        if (getOrientation(current, this, next) == Orient.collinear) {
+        if (getOrientation(current, this, next) == PointsOrientation.collinear) {
           return Line(current, next).onSegment(this);
         }
         count++;

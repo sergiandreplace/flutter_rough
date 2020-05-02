@@ -24,20 +24,64 @@ PointD rotatePoint(PointD point, PointD center, double degrees) {
 List<Line> rotateLines(List<Line> lines, PointD center, double degrees) =>
     lines.map((line) => Line(rotatePoint(line.source, center, degrees), rotatePoint(line.target, center, degrees))).toList();
 
-enum Orient { collinear, clockwise, counterclockwise }
+enum PointsOrientation { collinear, clockwise, counterclockwise }
 
-Orient getOrientation(PointD p, PointD q, PointD r) {
+PointsOrientation getOrientation(PointD p, PointD q, PointD r) {
   double val = (q.x - p.x) * (r.y - q.y) - (q.y - p.y) * (r.x - q.x);
   if (val == 0) {
-    return Orient.collinear;
+    return PointsOrientation.collinear;
   }
-  return val > 0 ? Orient.clockwise : Orient.counterclockwise;
+  return val > 0 ? PointsOrientation.clockwise : PointsOrientation.counterclockwise;
 }
 
 bool onSegmentPoints(PointD source, PointD point, PointD target) => Line(source, target).onSegment(point);
 
-extension IterableOperations on Iterable<double> {
-  double get max => reduce((curr, next) => curr > next ? curr : next);
+class ComputedEllipsePoints {
+  List<PointD> corePoints;
+  List<PointD> allPoints;
 
-  double get min => reduce((curr, next) => curr < next ? curr : next);
+  ComputedEllipsePoints({this.corePoints, this.allPoints});
+}
+
+class EllipseParams {
+  final double rx;
+  final double ry;
+  final double increment;
+
+  EllipseParams({this.rx, this.ry, this.increment});
+}
+
+class EllipseResult {
+  OpSet opset;
+  List<PointD> estimatedPoints;
+
+  EllipseResult({this.opset, this.estimatedPoints});
+}
+
+class Edge {
+  double yMin;
+  double yMax;
+  double x;
+  double isLope;
+
+  Edge({this.yMin, this.yMax, this.x, this.isLope});
+
+  Edge copyWith({double yMin, double yMax, double x, double isLope}) => Edge(
+        yMin: yMin ?? this.yMin,
+        yMax: yMax ?? this.yMax,
+        x: x ?? this.x,
+        isLope: isLope ?? this.isLope,
+      );
+
+  @override
+  String toString() {
+    return 'Edge{yMin: $yMin, yMax: $yMax, x: $x, isLope: $isLope}';
+  }
+}
+
+class ActiveEdge {
+  double s;
+  Edge edge;
+
+  ActiveEdge(this.s, this.edge);
 }

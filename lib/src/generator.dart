@@ -1,74 +1,46 @@
 import 'config.dart';
 import 'core.dart';
 import 'filler.dart';
+import 'geometry.dart';
 import 'renderer.dart';
 
 class Generator {
-  Drawable _d(String shape, List<OpSet> sets, DrawConfig options) {
-    return Drawable(shape: shape, sets: sets ?? List<OpSet>(), options: options);
+  final DrawConfig config;
+  final Filler filler;
+
+  Generator(this.config, this.filler);
+
+  Drawable _buildDrawable(OpSet drawSets, [List<PointD> fillPoints = const []]) {
+    final List<OpSet> sets = [];
+    if (fillPoints != null) {
+      sets.add(filler.fill(fillPoints));
+    }
+    sets.add(drawSets);
+    return Drawable(sets: sets, options: config);
   }
 
-  Drawable line(double x1, double y1, double x2, double y2, {DrawConfig options}) {
-    final o = options ?? DrawConfig();
-    return this._d('line', [buildLine(x1, y1, x2, y2, o)], o);
+  Drawable line(double x1, double y1, double x2, double y2) {
+    return _buildDrawable(OpSetBuilder.buildLine(x1, y1, x2, y2, config));
   }
 
-  Drawable rectangle(double x, double y, double width, double height,
-      {DrawConfig options, FillerConfig fillerOptions = const FillerConfig()}) {
-    final o = options ?? DrawConfig();
-    List<OpSet> paths = [];
-    OpSet outline = buildRectangle(x, y, width, height, o);
+  Drawable rectangle(double x, double y, double width, double height) {
     List<PointD> points = [PointD(x, y), PointD(x + width, y), PointD(x + width, y + height), PointD(x, y + height)];
-    paths.add(DotFiller().fill(points, fillerOptions));
-    paths.add(outline);
-    return _d('rectangle', paths, o);
+    OpSet outline = OpSetBuilder.buildPolygon(points, config);
+    return _buildDrawable(outline, points);
   }
 
-  Drawable circle(double x, double y, double diameter, {DrawConfig options, FillerConfig fillerOptions = const FillerConfig()}) {
-    Drawable ret = this.ellipse(x, y, diameter, diameter, options: options, fillerOptions: fillerOptions);
-    ret.shape = 'circle';
+  Drawable ellipse(double x, double y, double width, double height) {
+    EllipseParams ellipseParams = generateEllipseParams(width, height, config);
+    EllipseResult ellipseResponse = ellipseWithParams(x, y, config, ellipseParams);
+    return _buildDrawable(ellipseResponse.opset, ellipseResponse.estimatedPoints);
+  }
+
+  Drawable circle(double x, double y, double diameter) {
+    Drawable ret = this.ellipse(x, y, diameter, diameter);
     return ret;
   }
 
-  Drawable ellipse(double x, double y, double width, double height,
-      {DrawConfig options, FillerConfig fillerOptions = const FillerConfig()}) {
-    final o = options ?? DrawConfig();
-    List<OpSet> paths = [];
-    EllipseParams ellipseParams = generateEllipseParams(width, height, o);
-    EllipseResult ellipseResponse = ellipseWithParams(x, y, o, ellipseParams);
-
-//      if (o.fillStyle == 'solid') {
-//        OpSet shape = ellipseResponse.opset;
-//        shape.type = OpSetType.fillPath;
-//        paths.add(shape);
-//      } else {
-    paths.add(DotFiller().fill(ellipseResponse.estimatedPoints, fillerOptions));
-//      }
-
-    paths.add(ellipseResponse.opset);
-
-    return _d('ellipse', paths, o);
+  Drawable linearPath(List<PointD> points) {
+    return _buildDrawable(OpSetBuilder.linearPath(points, false, config));
   }
-}
-
-class ComputedEllipsePoints {
-  List<PointD> corePoints;
-  List<PointD> allPoints;
-
-  ComputedEllipsePoints({this.corePoints, this.allPoints});
-}
-
-class EllipseParams {
-  final double rx;
-  final double ry;
-  final double increment;
-
-  EllipseParams({this.rx, this.ry, this.increment});
-}
-
-class EllipseResult {
-  OpSet opset;
-  List<PointD> estimatedPoints;
-
-  EllipseResult({this.opset, this.estimatedPoints});
 }

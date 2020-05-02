@@ -29,9 +29,9 @@ class FillerConfig {
     this.fillWeight = 1,
     this.fillStyle = FillStyle.sketch,
     this.hachureAngle = -41,
-    this.hachureGap = 5,
-    this.dashOffset = 5,
-    this.dashGap = 5,
+    this.hachureGap = 15,
+    this.dashOffset = 15,
+    this.dashGap = 2,
     this.zigzagOffset = 5,
   });
 
@@ -58,7 +58,11 @@ class FillerConfig {
 }
 
 abstract class Filler {
-  OpSet fill(List<PointD> points, FillerConfig config);
+  final FillerConfig config;
+
+  Filler(this.config);
+
+  OpSet fill(List<PointD> points);
 
   List<Line> buildFillLines(List<PointD> points, FillerConfig config) {
     PointD rotationCenter = PointD(0, 0);
@@ -66,14 +70,14 @@ abstract class Filler {
     if (angle != 0) {
       points = rotatePoints(points, rotationCenter, angle);
     }
-    List<Line> lines = _straightenLines(points, config);
+    List<Line> lines = _straightenLines(points);
     if (angle != 0) {
       lines = rotateLines(lines, rotationCenter, -angle);
     }
     return lines;
   }
 
-  List<Line> _straightenLines(List<PointD> points, FillerConfig config) {
+  List<Line> _straightenLines(List<PointD> points) {
     List<PointD> vertices = points ?? [];
     List<Line> lines = [];
     if (vertices[0] != vertices[vertices.length - 1]) {
@@ -160,35 +164,9 @@ abstract class Filler {
   }
 }
 
-class Edge {
-  double yMin;
-  double yMax;
-  double x;
-  double isLope;
-
-  Edge({this.yMin, this.yMax, this.x, this.isLope});
-
-  Edge copyWith({double yMin, double yMax, double x, double isLope}) => Edge(
-        yMin: yMin ?? this.yMin,
-        yMax: yMax ?? this.yMax,
-        x: x ?? this.x,
-        isLope: isLope ?? this.isLope,
-      );
-
-  @override
-  String toString() {
-    return 'Edge{yMin: $yMin, yMax: $yMax, x: $x, isLope: $isLope}';
-  }
-}
-
-class ActiveEdge {
-  double s;
-  Edge edge;
-
-  ActiveEdge(this.s, this.edge);
-}
-
 abstract class BaseLineFiller extends Filler {
+  BaseLineFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
   OpSet fillPolygon(List<PointD> points, FillerConfig config, bool connectEnds) {
     List<Line> lines = buildFillLines(points, config);
     if (connectEnds) {
@@ -271,26 +249,32 @@ abstract class BaseLineFiller extends Filler {
   List<Op> renderLines(List<Line> lines, FillerConfig config) {
     List<Op> ops = [];
     lines.forEach((line) {
-      ops.addAll(doubleLine(line.source.x, line.source.y, line.target.x, line.target.y, config.drawConfig));
+      ops.addAll(OpSetBuilder.buildLine(line.source.x, line.source.y, line.target.x, line.target.y, config.drawConfig).ops);
     });
     return ops;
   }
 }
 
 class HachureFiller extends BaseLineFiller {
-  OpSet fill(List<PointD> points, FillerConfig config) {
+  HachureFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
+  OpSet fill(List<PointD> points) {
     return fillPolygon(points, config, false);
   }
 }
 
 class ZigZagFiller extends BaseLineFiller {
-  OpSet fill(List<PointD> points, FillerConfig config) {
+  ZigZagFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
+  OpSet fill(List<PointD> points) {
     return fillPolygon(points, config, true);
   }
 }
 
 class HatchFiller extends BaseLineFiller {
-  OpSet fill(List<PointD> points, FillerConfig config) {
+  HatchFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
+  OpSet fill(List<PointD> points) {
     OpSet set1 = fillPolygon(points, config, false);
     FillerConfig rotated = config.copyWith(hachureAngle: config.hachureAngle + 90);
     OpSet set2 = fillPolygon(points, rotated, false);
@@ -299,7 +283,9 @@ class HatchFiller extends BaseLineFiller {
 }
 
 class DashedFiller extends Filler {
-  OpSet fill(List<PointD> points, FillerConfig config) {
+  DashedFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
+  OpSet fill(List<PointD> points) {
     List<Line> lines = buildFillLines(points, config);
     return OpSet(type: OpSetType.fillSketch, ops: dashedLines(lines, config));
   }
@@ -329,7 +315,7 @@ class DashedFiller extends Filler {
         var segmentEndY = lineStart.y + (segmentEndOffset * sin(alpha)) + (lineOffset * sin(alpha));
         PointD gapEnd = PointD(segmentEndX, segmentEndY);
 
-        ops.addAll(doubleLine(gapStart.x, gapStart.y, gapEnd.x, gapEnd.y, config.drawConfig));
+        ops.addAll(OpsGenerator.doubleLine(gapStart.x, gapStart.y, gapEnd.x, gapEnd.y, config.drawConfig));
       }
     });
     return ops;
@@ -337,7 +323,9 @@ class DashedFiller extends Filler {
 }
 
 class DotFiller extends Filler {
-  OpSet fill(List<PointD> points, final FillerConfig config) {
+  DotFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
+  OpSet fill(List<PointD> points) {
     FillerConfig dotConfig = config.copyWith(
       drawConfig: config.drawConfig.copyWith(curveStepCount: 4, roughness: 1),
       hachureAngle: 0,
@@ -362,7 +350,7 @@ class DotFiller extends Filler {
         double y = minY + off + (i * gap);
         double cx = config.drawConfig.offset(x - ro, x + ro);
         double cy = config.drawConfig.offset(y - ro, y + ro);
-        OpSet el = ellipse(cx, cy, config.fillWeight, config.fillWeight, config.drawConfig);
+        OpSet el = OpSetBuilder.ellipse(cx, cy, config.fillWeight, config.fillWeight, config.drawConfig);
         ops.addAll(el.ops);
       }
     });
@@ -371,8 +359,10 @@ class DotFiller extends Filler {
 }
 
 class SolidFiller extends Filler {
+  SolidFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
   @override
-  OpSet fill(List<PointD> points, FillerConfig config) {
+  OpSet fill(List<PointD> points) {
     List<Op> ops = [];
     if (points.isNotEmpty) {
       double offset = config.drawConfig.maxRandomnessOffset;

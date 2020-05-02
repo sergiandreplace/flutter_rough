@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'config.dart';
 import 'core.dart';
-import 'generator.dart';
+import 'geometry.dart';
 
 List<Op> _line(double x1, double y1, double x2, double y2, DrawConfig config, bool move, bool overlay) {
   final lengthSq = pow((x1 - x2), 2) + pow((y1 - y2), 2);
@@ -55,46 +55,74 @@ List<Op> _line(double x1, double y1, double x2, double y2, DrawConfig config, bo
   return ops;
 }
 
-OpSet buildLine(double x1, double y1, double x2, double y2, DrawConfig config) {
-  return OpSet(type: OpSetType.path, ops: doubleLine(x1, y1, x2, y2, config));
-}
+class OpSetBuilder {
+  static OpSet buildLine(double x1, double y1, double x2, double y2, DrawConfig config) {
+    return OpSet(type: OpSetType.path, ops: OpsGenerator.doubleLine(x1, y1, x2, y2, config));
+  }
 
-OpSet buildRectangle(double x, double y, double width, double height, DrawConfig config) {
-  List<PointD> points = [PointD(x, y), PointD(x + width, y), PointD(x + width, y + height), PointD(x, y + height)];
-  return polygon(points, config);
-}
+  static OpSet ellipse(double x, double y, double width, double height, DrawConfig config) {
+    EllipseParams params = generateEllipseParams(width, height, config);
+    return ellipseWithParams(x, y, config, params).opset;
+  }
 
-List<Op> doubleLine(double x1, double y1, double x2, double y2, DrawConfig config) {
-  List<Op> o1 = _line(x1, y1, x2, y2, config, true, false);
-  List<Op> o2 = _line(x1, y1, x2, y2, config, true, true);
-  return o1 + o2;
-}
+  static OpSet buildPolygon(List<PointD> points, DrawConfig config) {
+    return linearPath(points, true, config);
+  }
 
-OpSet polygon(List<PointD> points, DrawConfig config) {
-  return linearPath(points, true, config);
-}
-
-OpSet linearPath(List<PointD> points, bool close, DrawConfig config) {
-  int len = (points ?? []).length;
-  if (len > 2) {
-    List<Op> ops = [];
-    for (int i = 0; i < len - 1; i++) {
-      ops += doubleLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, config);
+  static OpSet linearPath(List<PointD> points, bool close, DrawConfig config) {
+    int len = (points ?? []).length;
+    if (len > 2) {
+      List<Op> ops = [];
+      for (int i = 0; i < len - 1; i++) {
+        ops += OpsGenerator.doubleLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, config);
+      }
+      if (close) {
+        ops += OpsGenerator.doubleLine(points[len - 1].x, points[len - 1].y, points[0].x, points[0].y, config);
+      }
+      return OpSet(type: OpSetType.path, ops: ops);
+    } else if (len == 2) {
+      return buildLine(points[0].x, points[0].x, points[1].x, points[1].x, config);
+    } else {
+      return OpSet(type: OpSetType.path, ops: []);
     }
-    if (close) {
-      ops += doubleLine(points[len - 1].x, points[len - 1].y, points[0].x, points[0].y, config);
-    }
-    return OpSet(type: OpSetType.path, ops: ops);
-  } else if (len == 2) {
-    return buildLine(points[0].x, points[0].x, points[1].x, points[1].x, config);
-  } else {
-    return OpSet(type: OpSetType.path, ops: []);
   }
 }
 
-OpSet ellipse(double x, double y, double width, double height, DrawConfig config) {
-  EllipseParams params = generateEllipseParams(width, height, config);
-  return ellipseWithParams(x, y, config, params).opset;
+class OpsGenerator {
+  static List<Op> doubleLine(double x1, double y1, double x2, double y2, DrawConfig config) {
+    List<Op> o1 = _line(x1, y1, x2, y2, config, true, false);
+    List<Op> o2 = _line(x1, y1, x2, y2, config, true, true);
+    return o1 + o2;
+  }
+
+  static List<Op> curve(List<PointD> points, PointD closePoint, DrawConfig config) {
+    int len = points.length;
+    List<Op> ops = [];
+    if (len > 3) {
+      double s = 1 - config.curveTightness;
+      ops.add(Op.move(points[1]));
+      for (int i = 1; (i + 2) < len; i++) {
+        final point = points[i];
+        final next = points[i + 1];
+        final afterNext = points[i + 2];
+        var previous = points[i - 1];
+        final control1 = PointD(point.x + (s * next.x - s * previous.x) / 6, point.y + (s * next.y - s * previous.y) / 6);
+        final control2 = PointD(next.x + (s * point.x - s * afterNext.x) / 6, next.y + (s * point.y - s * afterNext.y) / 6);
+        final end = PointD(next.x, next.y);
+        ops.add(Op.curveTo(control1, control2, end));
+      }
+      if (closePoint != null) {
+        double ro = config.maxRandomnessOffset;
+        ops.add(Op.lineTo(PointD(closePoint.x + config.offsetSymmetric(ro), closePoint.y + config.offsetSymmetric(ro))));
+      }
+    } else if (len == 3) {
+      ops.add(Op.move(points[1]));
+      ops.add(Op.curveTo(points[1], points[2], points[2]));
+    } else if (len == 2) {
+      ops = doubleLine(points[0].x, points[0].y, points[1].x, points[1].y, config);
+    }
+    return ops;
+  }
 }
 
 EllipseParams generateEllipseParams(double width, double height, DrawConfig config) {
@@ -130,8 +158,8 @@ EllipseResult ellipseWithParams(double x, double y, DrawConfig config, EllipsePa
     overlap: 0,
     config: config,
   );
-  List<Op> o1 = curve(ellipsePoints1.allPoints, null, config);
-  List<Op> o2 = curve(ellipsePoints2.allPoints, null, config);
+  List<Op> o1 = OpsGenerator.curve(ellipsePoints1.allPoints, null, config);
+  List<Op> o2 = OpsGenerator.curve(ellipsePoints2.allPoints, null, config);
   return EllipseResult(estimatedPoints: ellipsePoints1.corePoints, opset: OpSet(type: OpSetType.path, ops: o1 + o2));
 }
 
@@ -173,33 +201,4 @@ ComputedEllipsePoints _computeEllipsePoints({
     config.offsetSymmetric(offset) + cy + 0.9 * ry * sin(radOffset + overlap * 0.5),
   ));
   return ComputedEllipsePoints(corePoints: corePoints, allPoints: allPoints);
-}
-
-List<Op> curve(List<PointD> points, PointD closePoint, DrawConfig config) {
-  int len = points.length;
-  List<Op> ops = [];
-  if (len > 3) {
-    double s = 1 - config.curveTightness;
-    ops.add(Op.move(points[1]));
-    for (int i = 1; (i + 2) < len; i++) {
-      final point = points[i];
-      final next = points[i + 1];
-      final afterNext = points[i + 2];
-      var previous = points[i - 1];
-      final control1 = PointD(point.x + (s * next.x - s * previous.x) / 6, point.y + (s * next.y - s * previous.y) / 6);
-      final control2 = PointD(next.x + (s * point.x - s * afterNext.x) / 6, next.y + (s * point.y - s * afterNext.y) / 6);
-      final end = PointD(next.x, next.y);
-      ops.add(Op.curveTo(control1, control2, end));
-    }
-    if (closePoint != null) {
-      double ro = config.maxRandomnessOffset;
-      ops.add(Op.lineTo(PointD(closePoint.x + config.offsetSymmetric(ro), closePoint.y + config.offsetSymmetric(ro))));
-    }
-  } else if (len == 3) {
-    ops.add(Op.move(points[1]));
-    ops.add(Op.curveTo(points[1], points[2], points[2]));
-  } else if (len == 2) {
-    ops = doubleLine(points[0].x, points[0].y, points[1].x, points[1].y, config);
-  }
-  return ops;
 }
