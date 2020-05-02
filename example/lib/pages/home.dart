@@ -47,7 +47,11 @@ class DemoRow extends StatelessWidget {
         title: Text(demo.name),
         dense: false,
         subtitle: Text(demo.description),
-        leading: CircleAvatar(child: demo.icon),
+        leading: Container(
+          child: demo.icon,
+          width: 42,
+          height: 42,
+        ),
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: demo.launcher)),
       ),
     );
