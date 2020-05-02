@@ -42,7 +42,7 @@ class FlutterLogoPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    DrawConfig config = DrawConfig(
+    DrawConfig config = DrawConfig.build(
       roughness: 1,
       maxRandomnessOffset: 1.2,
       bowing: 8,
@@ -53,16 +53,16 @@ class FlutterLogoPainter extends CustomPainter {
     );
 
     FillerConfig fillerConfig = FillerConfig(
-      hachureAngle: -40,
-      dashGap: 5,
-      dashOffset: 3,
-      drawConfig: config.copyWith(maxRandomnessOffset: 10, bowing: 0, curveFitting: 0.1, roughness: 0.8),
+      hachureAngle: -50,
+      dashGap: 3,
+      dashOffset: 2,
+      drawConfig: DrawConfig.build(maxRandomnessOffset: 1, bowing: 0, curveFitting: 0.1, roughness: 0.8),
       fillWeight: 10,
-      hachureGap: 2.5,
+      hachureGap: 10,
       zigzagOffset: 1,
     );
 
-    Generator gen = Generator(config, ZigZagFiller(fillerConfig));
+    Generator gen = Generator(config, HatchFiller(fillerConfig));
     canvas.scale(2);
     canvas.translate(11, 46);
     rough.draw(canvas, gen.polygon([PointD(37, 128), PointD(9, 101), PointD(100, 10), PointD(156, 10)]), stroke, fillPaint);

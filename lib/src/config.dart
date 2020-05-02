@@ -8,18 +8,49 @@ class DrawConfig {
   final double curveTightness; //renderer
   final double curveStepCount; //renderer
   final int seed;
+  final Randomizer randomizer;
 
-  const DrawConfig({
-    this.maxRandomnessOffset = 2,
-    this.roughness = 1,
-    this.bowing = 1,
-    this.curveFitting = 0.95,
-    this.curveTightness = 0,
-    this.curveStepCount = 9,
-    this.seed = 0,
+  static DrawConfig defaultValues = DrawConfig.build(
+    maxRandomnessOffset: 2,
+    roughness: 1,
+    bowing: 1,
+    curveFitting: 0.95,
+    curveTightness: 0,
+    curveStepCount: 9,
+    seed: 1,
+  );
+
+  const DrawConfig._({
+    this.maxRandomnessOffset,
+    this.roughness,
+    this.bowing,
+    this.curveFitting,
+    this.curveTightness,
+    this.curveStepCount,
+    this.seed,
+    this.randomizer,
   });
 
-  Randomizer get randomizer => Randomizer(seed: this.seed);
+  static DrawConfig build({
+    double maxRandomnessOffset,
+    double roughness,
+    double bowing,
+    double curveFitting,
+    double curveTightness,
+    double curveStepCount,
+    int seed,
+  }) =>
+      DrawConfig._(
+          maxRandomnessOffset: maxRandomnessOffset ?? defaultValues.maxRandomnessOffset,
+          roughness: roughness ?? defaultValues.roughness,
+          bowing: bowing ?? defaultValues.bowing,
+          curveFitting: curveFitting ?? defaultValues.curveFitting,
+          curveTightness: curveTightness ?? defaultValues.curveTightness,
+          curveStepCount: curveStepCount ?? defaultValues.curveStepCount,
+          seed: seed ?? defaultValues.seed,
+          randomizer: Randomizer(
+            seed: seed ?? defaultValues.seed,
+          ));
 
   double offset(double min, double max, [double roughnessGain = 1]) {
     return roughness * roughnessGain * ((randomizer.next() * (max - min)) + min);
@@ -45,35 +76,29 @@ class DrawConfig {
     double zigzagOffset,
     int seed,
     bool combineNestedSvgPaths,
+    Randomizer randomizer,
   }) =>
-      DrawConfig(
-        maxRandomnessOffset: maxRandomnessOffset ?? this.maxRandomnessOffset,
-        roughness: roughness ?? this.roughness,
-        bowing: bowing ?? this.bowing,
-        curveFitting: curveFitting ?? this.curveFitting,
-        curveTightness: curveTightness ?? this.curveTightness,
-        curveStepCount: curveStepCount ?? this.curveStepCount,
-        seed: seed ?? this.seed,
-      );
+      DrawConfig._(
+          maxRandomnessOffset: maxRandomnessOffset ?? this.maxRandomnessOffset,
+          roughness: roughness ?? this.roughness,
+          bowing: bowing ?? this.bowing,
+          curveFitting: curveFitting ?? this.curveFitting,
+          curveTightness: curveTightness ?? this.curveTightness,
+          curveStepCount: curveStepCount ?? this.curveStepCount,
+          seed: seed ?? this.seed,
+          randomizer: randomizer ?? (this.randomizer == null ? null : Randomizer(seed: this.randomizer.seed)));
 }
 
 class Randomizer {
-  static Randomizer _randomizer;
-  int _seed;
   Random _random;
+  int _seed;
 
-  factory Randomizer({int seed = 0}) {
-    if (_randomizer == null || _randomizer._seed != seed) {
-      _randomizer = Randomizer._();
-      _randomizer._seed = seed;
-      _randomizer._random = Random(seed);
-    }
-    return _randomizer;
+  Randomizer({int seed = 0}) {
+    _seed = seed;
+    _random = Random(seed);
   }
 
+  int get seed => _seed;
+
   double next() => _random.nextDouble();
-
-  get seed => _seed;
-
-  Randomizer._();
 }

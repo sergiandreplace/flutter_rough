@@ -23,8 +23,8 @@ class Rough {
   }
 
   draw(Canvas canvas, Drawable drawable, Paint pathPaint, Paint fillPaint) {
-    final sets = drawable.sets ?? [];
-    sets.forEach((drawing) {
+    final List<OpSet> opSets = drawable.sets ?? [];
+    opSets.forEach((drawing) {
       switch (drawing.type) {
         case OpSetType.path:
           _drawToContext(canvas, drawing, pathPaint);

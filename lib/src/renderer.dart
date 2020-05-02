@@ -42,15 +42,39 @@ List<Op> _line(double x1, double y1, double x2, double y2, DrawConfig config, bo
     }
   }
   if (overlay) {
-    ops.add(Op.curveTo(
-        PointD(offsetX + x1 + (x2 - x1) * divergePoint + randomHalf(), offsetY + y1 + (y2 - y1) * divergePoint + randomHalf()),
-        PointD(offsetX + x1 + 2 * (x2 - x1) * divergePoint + randomHalf(), offsetY + y1 + 2 * (y2 - y1) * divergePoint + randomHalf()),
-        PointD(x2 + randomHalf(), y2 + randomHalf())));
+    ops.add(
+      Op.curveTo(
+        PointD(
+          offsetX + x1 + (x2 - x1) * divergePoint + randomHalf(),
+          offsetY + y1 + (y2 - y1) * divergePoint + randomHalf(),
+        ),
+        PointD(
+          offsetX + x1 + 2 * (x2 - x1) * divergePoint + randomHalf(),
+          offsetY + y1 + 2 * (y2 - y1) * divergePoint + randomHalf(),
+        ),
+        PointD(
+          x2 + randomHalf(),
+          y2 + randomHalf(),
+        ),
+      ),
+    );
   } else {
-    ops.add(Op.curveTo(
-        PointD(offsetX + x1 + (x2 - x1) * divergePoint + randomFull(), offsetY + y1 + (y2 - y1) * divergePoint + randomFull()),
-        PointD(offsetX + x1 + 2 * (x2 - x1) * divergePoint + randomFull(), offsetY + y1 + 2 * (y2 - y1) * divergePoint + randomFull()),
-        PointD(x2 + randomFull(), y2 + randomFull())));
+    ops.add(
+      Op.curveTo(
+        PointD(
+          offsetX + x1 + (x2 - x1) * divergePoint + randomFull(),
+          offsetY + y1 + (y2 - y1) * divergePoint + randomFull(),
+        ),
+        PointD(
+          offsetX + x1 + 2 * (x2 - x1) * divergePoint + randomFull(),
+          offsetY + y1 + 2 * (y2 - y1) * divergePoint + randomFull(),
+        ),
+        PointD(
+          x2 + randomFull(),
+          y2 + randomFull(),
+        ),
+      ),
+    );
   }
   return ops;
 }

@@ -15,7 +15,7 @@ class IntersectionInfo {
 enum FillStyle { fill, sketch }
 
 class FillerConfig {
-  final DrawConfig drawConfig;
+  final DrawConfig _drawConfig;
   final double fillWeight;
   final double hachureAngle;
   final double hachureGap;
@@ -24,14 +24,16 @@ class FillerConfig {
   final double zigzagOffset;
 
   const FillerConfig({
-    this.drawConfig = const DrawConfig(),
+    DrawConfig drawConfig,
     this.fillWeight = 1,
     this.hachureAngle = -41,
     this.hachureGap = 15,
     this.dashOffset = 15,
     this.dashGap = 2,
     this.zigzagOffset = 5,
-  });
+  }) : this._drawConfig = drawConfig;
+
+  DrawConfig get drawConfig => _drawConfig;
 
   FillerConfig copyWith({
     DrawConfig drawConfig,
@@ -43,7 +45,7 @@ class FillerConfig {
     double zigzagOffset,
   }) =>
       FillerConfig(
-        drawConfig: drawConfig ?? this.drawConfig,
+        drawConfig: drawConfig ?? this._drawConfig,
         fillWeight: fillWeight ?? this.fillWeight,
         hachureAngle: hachureAngle ?? this.hachureAngle,
         hachureGap: hachureGap ?? this.hachureGap,
