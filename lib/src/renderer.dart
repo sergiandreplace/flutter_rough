@@ -147,6 +147,30 @@ class OpSetBuilder {
     }
     return OpSet(type: OpSetType.path, ops: ops);
   }
+
+  static List<PointD> arcPolygon(PointD center, double width, double height, double startAngle, double stopAngle, DrawConfig config) {
+    double radiusX = (width / 2).abs();
+    double radiusY = (height / 2).abs();
+    radiusX += config.offsetSymmetric(radiusX * 0.01);
+    radiusY += config.offsetSymmetric(radiusY * 0.01);
+    double start = startAngle;
+    double stop = stopAngle;
+    while (start < 0) {
+      start += pi * 2;
+      stop += pi * 2;
+    }
+    if ((stop - start) > (pi * 2)) {
+      start = 0;
+      stop = pi * 2;
+    }
+    final double increment = (stop - start) / config.curveStepCount;
+    List<PointD> points = [];
+    for (double angle = start; angle <= stop; angle = angle + increment) {
+      points.add(PointD(center.x + radiusX + cos(angle), center.y + radiusY + sin(angle)));
+    }
+    points..add(PointD(center.x + radiusX * cos(stop), center.y + radiusY * sin(stop)))..add(center);
+    return points;
+  }
 }
 
 class OpsGenerator {

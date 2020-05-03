@@ -47,8 +47,8 @@ class Generator {
 
   Drawable arc(double x, double y, double width, double height, double start, double stop, [bool closed = false]) {
     OpSet outline = OpSetBuilder.arc(PointD(x, y), width, height, start, stop, closed, true, config);
-
-    return _buildDrawable(outline, []);
+    List<PointD> fillPoints = OpSetBuilder.arcPolygon(PointD(x, y), width, height, start, stop, config);
+    return _buildDrawable(outline, fillPoints);
   }
 
   Drawable polygon(List<PointD> points) {
