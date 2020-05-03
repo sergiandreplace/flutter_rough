@@ -43,7 +43,7 @@ class ArcPainter extends InteractivePainter {
   void paintRough(Canvas canvas, Size size) {
     Generator generator = Generator(drawConfig, HachureFiller(const FillerConfig().copyWith(drawConfig: drawConfig)));
     double s = min(size.width, size.height);
-    Drawable figure = generator.arc(size.width / 2, size.height / 2, s * 0.8, s * 0.8, 0, pi * 1.8, true);
+    Drawable figure = generator.arc(size.width / 2, size.height / 2, s * 0.8, s * 0.8, pi * 0.2, pi * 1.8, true);
     Rough().draw(canvas, figure, pathPaint, fillPaint);
   }
 }

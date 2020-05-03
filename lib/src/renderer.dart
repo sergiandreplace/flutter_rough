@@ -163,10 +163,12 @@ class OpSetBuilder {
       start = 0;
       stop = pi * 2;
     }
-    final double increment = (stop - start) / config.curveStepCount;
+    double ellipseInc = pi * 2 / config.curveStepCount;
+    double increment = min(ellipseInc / 2, (stop - start) / 2);
+    //final double increment = (stop - start) / (config.curveStepCount * 2);
     List<PointD> points = [];
     for (double angle = start; angle <= stop; angle = angle + increment) {
-      points.add(PointD(center.x + radiusX + cos(angle), center.y + radiusY + sin(angle)));
+      points.add(PointD(center.x + radiusX * cos(angle), center.y + radiusY * sin(angle)));
     }
     points..add(PointD(center.x + radiusX * cos(stop), center.y + radiusY * sin(stop)))..add(center);
     return points;
