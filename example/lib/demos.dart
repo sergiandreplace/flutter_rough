@@ -1,5 +1,6 @@
 import 'package:RoughExample/pages/flutter_logo.dart';
 import 'package:RoughExample/pages/interactive_circle.dart';
+import 'package:RoughExample/pages/interactive_rectangle.dart';
 import 'package:flutter/material.dart';
 
 class Demo {
@@ -23,7 +24,16 @@ final List<Demo> demos = [
     "A circle drawn with Rough generated with interactive parameters",
     (context) => InteractiveCirclePage(),
     Icon(
-      Icons.swap_vertical_circle,
+      Icons.add_circle,
+      size: 36,
+    ),
+  ),
+  Demo(
+    "Interactive rectangle",
+    "A rectange drawn with Rough generated with interactive parameters",
+    (context) => InteractiveRectanglePage(),
+    Icon(
+      Icons.add_box,
       size: 36,
     ),
   ),
