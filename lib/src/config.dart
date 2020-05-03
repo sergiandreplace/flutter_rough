@@ -104,7 +104,7 @@ class Randomizer {
 class Randomizer2 {
   int _seed;
 
-  Randomizer({int seed = 0}) {
+  Randomizer2({int seed = 0}) {
     _seed = seed;
   }
 
