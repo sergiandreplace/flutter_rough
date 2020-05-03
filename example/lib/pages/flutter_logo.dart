@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:rough/rough.dart';
 
@@ -12,10 +14,9 @@ class FlutterLogoPage extends StatelessWidget {
         painterbuilder: (drawConfig) => FlutterLogoPainter(drawConfig),
         properties: <DiscreteProperty>[
           DiscreteProperty(name: "seed", label: "Seed", min: 0, max: 50, steps: 50),
-          DiscreteProperty(name: "roughness", label: "Rougness", min: 0, max: 2, steps: 50),
-          DiscreteProperty(name: "curveFitting", label: "curveFitting", min: 0, max: 2, steps: 50),
-          DiscreteProperty(name: "curveTightness", label: "curveTightness", min: 0, max: 1, steps: 100),
-          DiscreteProperty(name: "curveStepCount", label: "curveStepCount", min: 1, max: 11, steps: 100),
+          DiscreteProperty(name: "roughness", label: "Roughness", min: 0, max: 5, steps: 50),
+          DiscreteProperty(name: "bowing", label: "Bowing", min: 0, max: 10, steps: 50),
+          DiscreteProperty(name: "maxRandomnessOffset", label: "maxRandomnessOffset", min: 0, max: 10, steps: 50),
         ],
       ),
     );
@@ -43,18 +44,26 @@ class FlutterLogoPainter extends InteractivePainter {
   @override
   void paintRough(canvas, size) {
     FillerConfig fillerConfig = FillerConfig(
-      hachureAngle: -50,
+      hachureAngle: 80,
       dashGap: 3,
-      dashOffset: 2,
-      drawConfig: drawConfig.copyWith(maxRandomnessOffset: 1, bowing: 0, curveFitting: 0.1, roughness: 0.8),
+      dashOffset: 1,
+      drawConfig: drawConfig,
       fillWeight: 10,
-      hachureGap: 10,
-      zigzagOffset: 1,
+      hachureGap: 3,
+      zigzagOffset: 10,
     );
 
-    Generator gen = Generator(drawConfig, ZigZagFiller(fillerConfig));
-    canvas.scale(1);
-    canvas.translate(11, 46);
+    Generator gen = Generator(drawConfig, HatchFiller(fillerConfig));
+    double logoWidth = 165;
+    double logoHeight = 201;
+    double widthScale = (size.width) / (logoWidth);
+    double heightScale = (size.height) / (logoHeight);
+    double scale = min(widthScale, heightScale);
+    double translateX = (size.width - logoWidth * scale) / 2;
+    double translateY = (size.height - logoHeight * scale) / 2;
+
+    canvas.translate(translateX, translateY);
+    canvas.scale(scale);
     rough.draw(canvas, gen.polygon([PointD(37, 128), PointD(9, 101), PointD(100, 10), PointD(156, 10)]), stroke, fillPaint);
     canvas.translate(-4, -4);
     rough.draw(canvas, gen.polygon([PointD(156, 94), PointD(100, 94), PointD(50, 141), PointD(79, 170)]), stroke, fillPaint);
