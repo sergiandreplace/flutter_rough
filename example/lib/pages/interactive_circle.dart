@@ -105,10 +105,10 @@ class _InteractiveBodyState extends State<InteractiveBody> {
                 ),
               ),
               ConfigSlider(
-                label: "rougness",
+                label: "roughness",
                 value: roughness,
                 min: 0,
-                max: 5,
+                max: 2,
                 steps: 50,
                 onChange: (value) => updateState(roughness: value),
               ),
@@ -145,8 +145,9 @@ class _InteractiveBodyState extends State<InteractiveBody> {
               ConfigSlider(
                 label: "curveStepCount",
                 value: curveStepCount,
-                min: 2,
-                max: 10,
+                min: 1,
+                max: 11,
+                steps: 100,
                 onChange: (value) => updateState(curveStepCount: value),
               ),
             ],
@@ -226,14 +227,14 @@ class CirclePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     DrawConfig drawConfig = DrawConfig.build(
-      roughness: roughness,
-      maxRandomnessOffset: maxRandomnessOffset,
-      bowing: bowing,
-      curveFitting: curveFitting,
-      curveTightness: curveTightness,
-      curveStepCount: curveStepCount,
-    );
-    Generator generator = Generator(drawConfig, ZigZagFiller(FillerConfig().copyWith(drawConfig: drawConfig)));
+        roughness: roughness,
+        maxRandomnessOffset: maxRandomnessOffset,
+        bowing: bowing,
+        curveFitting: curveFitting,
+        curveTightness: curveTightness,
+        curveStepCount: curveStepCount,
+        seed: 1);
+    Generator generator = Generator(drawConfig, NoFiller(FillerConfig().copyWith(drawConfig: drawConfig)));
     Drawable figure;
     double s = min(size.width, size.height);
     switch (shape) {

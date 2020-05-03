@@ -119,7 +119,7 @@ class OpsGenerator {
     return o1 + o2;
   }
 
-  static List<Op> curve(List<PointD> points, PointD closePoint, DrawConfig config) {
+  static List<Op> curve(List<PointD> points, DrawConfig config) {
     int len = points.length;
     List<Op> ops = [];
     if (len > 3) {
@@ -134,10 +134,6 @@ class OpsGenerator {
         final control2 = PointD(next.x + (s * point.x - s * afterNext.x) / 6, next.y + (s * point.y - s * afterNext.y) / 6);
         final end = PointD(next.x, next.y);
         ops.add(Op.curveTo(control1, control2, end));
-      }
-      if (closePoint != null) {
-        double ro = config.maxRandomnessOffset;
-        ops.add(Op.lineTo(PointD(closePoint.x + config.offsetSymmetric(ro), closePoint.y + config.offsetSymmetric(ro))));
       }
     } else if (len == 3) {
       ops.add(Op.move(points[1]));
@@ -182,9 +178,9 @@ EllipseResult ellipseWithParams(double x, double y, DrawConfig config, EllipsePa
     overlap: 0,
     config: config,
   );
-  List<Op> o1 = OpsGenerator.curve(ellipsePoints1.allPoints, null, config);
-  List<Op> o2 = OpsGenerator.curve(ellipsePoints2.allPoints, null, config);
-  return EllipseResult(estimatedPoints: ellipsePoints1.corePoints, opset: OpSet(type: OpSetType.path, ops: o1 + o2));
+  List<Op> o1 = OpsGenerator.curve(ellipsePoints1.allPoints, config);
+  List<Op> o2 = OpsGenerator.curve(ellipsePoints2.allPoints, config);
+  return EllipseResult(estimatedPoints: ellipsePoints1.corePoints, opset: OpSet(type: OpSetType.path, ops: o1)); //+ o2));
 }
 
 ComputedEllipsePoints _computeEllipsePoints({
@@ -201,8 +197,8 @@ ComputedEllipsePoints _computeEllipsePoints({
   List<PointD> allPoints = [];
   double radOffset = config.offsetSymmetric(0.5) - pi / 2;
   allPoints.add(PointD(
-    config.offsetSymmetric(offset) + cx + 0.9 * rx + cos(radOffset - increment),
-    config.offsetSymmetric(offset) + cy + 0.9 * ry + sin(radOffset - increment),
+    config.offsetSymmetric(offset) + cx + 0.9 * rx * cos(radOffset - increment),
+    config.offsetSymmetric(offset) + cy + 0.9 * ry * sin(radOffset - increment),
   ));
   for (double angle = radOffset; angle < (pi * 2 + radOffset - 0.01); angle = angle + increment) {
     PointD p = PointD(

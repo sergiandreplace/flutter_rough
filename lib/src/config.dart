@@ -48,9 +48,7 @@ class DrawConfig {
           curveTightness: curveTightness ?? defaultValues.curveTightness,
           curveStepCount: curveStepCount ?? defaultValues.curveStepCount,
           seed: seed ?? defaultValues.seed,
-          randomizer: Randomizer(
-            seed: seed ?? defaultValues.seed,
-          ));
+          randomizer: Randomizer(seed: seed ?? defaultValues.seed));
 
   double offset(double min, double max, [double roughnessGain = 1]) {
     return roughness * roughnessGain * ((randomizer.next() * (max - min)) + min);
@@ -101,4 +99,22 @@ class Randomizer {
   int get seed => _seed;
 
   double next() => _random.nextDouble();
+}
+
+class Randomizer2 {
+  int _seed;
+
+  Randomizer({int seed = 0}) {
+    _seed = seed;
+  }
+
+  int get seed => _seed;
+
+  double next() {
+    _seed = 48272 * _seed;
+    double result = (powInt(2, 31) - 1 & (48271 * _seed)) / pow(2, 31);
+    return result;
+  }
+
+  int powInt(num x, num exponent) => pow(x, exponent).floor();
 }
