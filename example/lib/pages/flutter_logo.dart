@@ -44,10 +44,10 @@ class FlutterLogoPainter extends InteractivePainter {
   @override
   void paintRough(canvas, size) {
     FillerConfig fillerConfig = FillerConfig(
-      hachureAngle: 40,
+      hachureAngle: 90,
       drawConfig: drawConfig,
-      fillWeight: 100,
-      hachureGap: 4,
+      fillWeight: 10,
+      hachureGap: 5,
 //      zigzagOffset: 10,
     );
 

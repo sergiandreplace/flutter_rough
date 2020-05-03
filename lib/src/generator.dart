@@ -1,5 +1,6 @@
 import 'config.dart';
 import 'core.dart';
+import 'entities.dart';
 import 'filler.dart';
 import 'geometry.dart';
 import 'renderer.dart';
@@ -36,7 +37,7 @@ class Generator {
   }
 
   Drawable circle(double x, double y, double diameter) {
-    Drawable ret = this.ellipse(x, y, diameter, diameter);
+    Drawable ret = ellipse(x, y, diameter, diameter);
     return ret;
   }
 

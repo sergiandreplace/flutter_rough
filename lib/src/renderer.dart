@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'config.dart';
 import 'core.dart';
+import 'entities.dart';
 import 'geometry.dart';
 
 List<Op> _line(double x1, double y1, double x2, double y2, DrawConfig config, bool move, bool overlay) {
@@ -30,7 +31,7 @@ List<Op> _line(double x1, double y1, double x2, double y2, DrawConfig config, bo
   offsetX = config.offsetSymmetric(offsetX, roughnessGain);
   offsetY = config.offsetSymmetric(offsetY, roughnessGain);
 
-  final ops = List<Op>();
+  final ops = <Op>[];
   final randomHalf = () => config.offsetSymmetric(halfOffset, roughnessGain);
   final randomFull = () => config.offsetSymmetric(offset, roughnessGain);
 
@@ -121,8 +122,8 @@ class OpsGenerator {
 
   static List<Op> curve(List<PointD> points, DrawConfig config) {
     int len = points.length;
-    List<Op> ops = [];
     if (len > 3) {
+      List<Op> ops = [];
       double s = 1 - config.curveTightness;
       ops.add(Op.move(points[1]));
       for (int i = 1; (i + 2) < len; i++) {
@@ -134,14 +135,14 @@ class OpsGenerator {
         final control2 = PointD(next.x + (s * point.x - s * afterNext.x) / 6, next.y + (s * point.y - s * afterNext.y) / 6);
         final end = PointD(next.x, next.y);
         ops.add(Op.curveTo(control1, control2, end));
+        return ops;
       }
     } else if (len == 3) {
-      ops.add(Op.move(points[1]));
-      ops.add(Op.curveTo(points[1], points[2], points[2]));
+      return []..add(Op.move(points[1]))..add(Op.curveTo(points[1], points[2], points[2]));
     } else if (len == 2) {
-      ops = doubleLine(points[0].x, points[0].y, points[1].x, points[1].y, config);
+      return doubleLine(points[0].x, points[0].y, points[1].x, points[1].y, config);
     }
-    return ops;
+    return [];
   }
 }
 
@@ -208,17 +209,18 @@ ComputedEllipsePoints _computeEllipsePoints({
     allPoints.add(p);
     corePoints.add(p);
   }
-  allPoints.add(PointD(
-    config.offsetSymmetric(offset) + cx + rx * cos(radOffset + pi * 2 + overlap * 0.5),
-    config.offsetSymmetric(offset) + cy + ry * sin(radOffset + pi * 2 + overlap * 0.5),
-  ));
-  allPoints.add(PointD(
-    config.offsetSymmetric(offset) + cx + 0.98 * rx * cos(radOffset + overlap),
-    config.offsetSymmetric(offset) + cy + 0.98 * ry * sin(radOffset + overlap),
-  ));
-  allPoints.add(PointD(
-    config.offsetSymmetric(offset) + cx + 0.9 * rx * cos(radOffset + overlap * 0.5),
-    config.offsetSymmetric(offset) + cy + 0.9 * ry * sin(radOffset + overlap * 0.5),
-  ));
+  allPoints
+    ..add(PointD(
+      config.offsetSymmetric(offset) + cx + rx * cos(radOffset + pi * 2 + overlap * 0.5),
+      config.offsetSymmetric(offset) + cy + ry * sin(radOffset + pi * 2 + overlap * 0.5),
+    ))
+    ..add(PointD(
+      config.offsetSymmetric(offset) + cx + 0.98 * rx * cos(radOffset + overlap),
+      config.offsetSymmetric(offset) + cy + 0.98 * ry * sin(radOffset + overlap),
+    ))
+    ..add(PointD(
+      config.offsetSymmetric(offset) + cx + 0.9 * rx * cos(radOffset + overlap * 0.5),
+      config.offsetSymmetric(offset) + cy + 0.9 * ry * sin(radOffset + overlap * 0.5),
+    ));
   return ComputedEllipsePoints(corePoints: corePoints, allPoints: allPoints);
 }

@@ -1,6 +1,7 @@
 import 'dart:math';
 
-import 'package:rough/src/core.dart';
+import 'core.dart';
+import 'entities.dart';
 
 List<PointD> rotatePoints(List<PointD> points, PointD center, double degrees) {
   if (points != null && points.isNotEmpty) {
@@ -66,11 +67,11 @@ class Edge {
 
   Edge({this.yMin, this.yMax, this.x, this.slope});
 
-  Edge copyWith({double yMin, double yMax, double x, double isLope}) => Edge(
+  Edge copyWith({double yMin, double yMax, double x, double slope}) => Edge(
         yMin: yMin ?? this.yMin,
         yMax: yMax ?? this.yMax,
         x: x ?? this.x,
-        slope: isLope ?? this.slope,
+        slope: slope ?? this.slope,
       );
 
   @override

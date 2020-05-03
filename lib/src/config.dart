@@ -58,7 +58,7 @@ class DrawConfig {
     return offset(-x, x, roughnessGain);
   }
 
-  copyWith({
+  DrawConfig copyWith({
     double maxRandomnessOffset,
     double roughness,
     double bowing,

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class Demo {
   final String name;
   final String description;
-  final Function launcher;
+  final WidgetBuilder launcher;
   final Widget icon;
 
   Demo(this.name, this.description, this.launcher, this.icon);

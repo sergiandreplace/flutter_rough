@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'config.dart';
 import 'core.dart';
+import 'entities.dart';
 import 'geometry.dart';
 import 'renderer.dart';
 
@@ -31,7 +32,7 @@ class FillerConfig {
     this.dashOffset = 15,
     this.dashGap = 2,
     this.zigzagOffset = 5,
-  }) : this._drawConfig = drawConfig;
+  }) : _drawConfig = drawConfig;
 
   DrawConfig get drawConfig => _drawConfig;
 
@@ -45,7 +46,7 @@ class FillerConfig {
     double zigzagOffset,
   }) =>
       FillerConfig(
-        drawConfig: drawConfig ?? this._drawConfig,
+        drawConfig: drawConfig ?? _drawConfig,
         fillWeight: fillWeight ?? this.fillWeight,
         hachureAngle: hachureAngle ?? this.hachureAngle,
         hachureGap: hachureGap ?? this.hachureGap,
@@ -132,17 +133,16 @@ abstract class Filler {
           }
           List<Edge> removed = edges.sublist(0, ix + 1);
           edges.removeRange(0, ix + 1);
-          removed.forEach((edge) {
-            activeEdges.add(ActiveEdge(y, edge));
-          });
+          activeEdges.addAll(removed.map((edge) => ActiveEdge(y, edge)));
         }
-        activeEdges = activeEdges.where((ae) => ae.edge.yMax > y).toList();
-        activeEdges.sort((ae1, ae2) {
-          if (ae1.edge.x == ae2.edge.x) {
-            return 0;
-          }
-          return ((ae1.edge.x - ae2.edge.x) / ((ae1.edge.x - ae2.edge.x)).abs()).ceil();
-        });
+        activeEdges = activeEdges
+          ..where((ae) => ae.edge.yMax > y).toList()
+          ..sort((ae1, ae2) {
+            if (ae1.edge.x == ae2.edge.x) {
+              return 0;
+            }
+            return ((ae1.edge.x - ae2.edge.x) / ((ae1.edge.x - ae2.edge.x)).abs()).ceil();
+          });
 
         // fill between the edges
         if (activeEdges.length > 1) {
@@ -216,7 +216,7 @@ abstract class BaseLineFiller extends Filler {
       PointD p2 = polygon[(i + 1) % polygon.length];
       Line polygonSegment = Line(p1, p2);
       if (segment.intersects(polygonSegment)) {
-        Point ip = segment.intersectionWith(polygonSegment);
+        PointD ip = segment.intersectionWith(polygonSegment);
         if (ip != null) {
           double d0 = Line(ip, segment.source).length;
           double d1 = Line(ip, segment.target).length;
@@ -228,7 +228,7 @@ abstract class BaseLineFiller extends Filler {
     }
     if (intersections.length > 1) {
       intersections.sort((a, b) => (a.distance - b.distance).ceil());
-      List<PointD> intersectionPoints = intersections.map((d) => d.point);
+      List<PointD> intersectionPoints = intersections.map((d) => d.point).toList();
       if (segment.source.isInPolygon(polygon)) {
         intersectionPoints.removeAt(0);
       }
@@ -242,7 +242,7 @@ abstract class BaseLineFiller extends Filler {
           return [];
         }
       }
-      List<Point> splitPoints = [segment.source] + intersectionPoints + [segment.target];
+      List<PointD> splitPoints = [segment.source] + intersectionPoints + [segment.target];
       List<Line> splitLines = [];
       for (int i = 0; i < (splitPoints.length - 1); i += 2) {
         Line subSegment = Line(splitPoints[i], splitPoints[i + 1]);
@@ -260,9 +260,17 @@ abstract class BaseLineFiller extends Filler {
 
   List<Op> renderLines(List<Line> lines, FillerConfig config) {
     List<Op> ops = [];
-    lines.forEach((line) {
-      ops.addAll(OpSetBuilder.buildLine(line.source.x, line.source.y, line.target.x, line.target.y, config.drawConfig).ops);
-    });
+    for (Line line in lines) {
+      ops.addAll(
+        OpSetBuilder.buildLine(
+          line.source.x,
+          line.source.y,
+          line.target.x,
+          line.target.y,
+          config.drawConfig,
+        ).ops,
+      );
+    }
     return ops;
   }
 }
@@ -270,6 +278,7 @@ abstract class BaseLineFiller extends Filler {
 class HachureFiller extends BaseLineFiller {
   HachureFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
+  @override
   OpSet fill(List<PointD> points) {
     return fillPolygon(points, config, false);
   }
@@ -278,6 +287,7 @@ class HachureFiller extends BaseLineFiller {
 class ZigZagFiller extends BaseLineFiller {
   ZigZagFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
+  @override
   OpSet fill(List<PointD> points) {
     return fillPolygon(points, config, true);
   }
@@ -286,6 +296,7 @@ class ZigZagFiller extends BaseLineFiller {
 class HatchFiller extends BaseLineFiller {
   HatchFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
+  @override
   OpSet fill(List<PointD> points) {
     OpSet set1 = fillPolygon(points, config, false);
     FillerConfig rotated = config.copyWith(hachureAngle: config.hachureAngle + 90);
@@ -297,6 +308,7 @@ class HatchFiller extends BaseLineFiller {
 class DashedFiller extends Filler {
   DashedFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
+  @override
   OpSet fill(List<PointD> points) {
     List<Line> lines = buildFillLines(points, config);
     return OpSet(type: OpSetType.fillSketch, ops: dashedLines(lines, config));
@@ -306,7 +318,7 @@ class DashedFiller extends Filler {
     double offset = config.dashOffset;
     double gap = config.dashGap;
     List<Op> ops = [];
-    lines.forEach((line) {
+    for (Line line in lines) {
       double length = line.length;
       int count = (length / (offset + gap)).floor();
       double lineOffset = (length + gap - (count * (offset + gap))) / 2;
@@ -329,7 +341,7 @@ class DashedFiller extends Filler {
 
         ops.addAll(OpsGenerator.doubleLine(gapStart.x, gapStart.y, gapEnd.x, gapEnd.y, config.drawConfig));
       }
-    });
+    }
     return ops;
   }
 }
@@ -337,6 +349,7 @@ class DashedFiller extends Filler {
 class DotFiller extends Filler {
   DotFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
+  @override
   OpSet fill(List<PointD> points) {
     FillerConfig dotConfig = config.copyWith(
       drawConfig: config.drawConfig.copyWith(curveStepCount: 4, roughness: 1),
@@ -351,7 +364,7 @@ class DotFiller extends Filler {
     final double gap = max(config.hachureGap, 0.1);
     final double fWeight = max(config.fillWeight, 0.1);
     final double ro = gap / 4;
-    lines.forEach((line) {
+    for (Line line in lines) {
       final double length = line.length;
       final double dl = length / gap;
       final int count = dl.ceil() - 1;
@@ -365,7 +378,7 @@ class DotFiller extends Filler {
         OpSet el = OpSetBuilder.ellipse(cx, cy, fWeight, fWeight, config.drawConfig);
         ops.addAll(el.ops);
       }
-    });
+    }
     return OpSet(type: OpSetType.fillSketch, ops: ops);
   }
 }
@@ -380,7 +393,7 @@ class SolidFiller extends Filler {
       double offset = config.drawConfig.maxRandomnessOffset;
       int len = points.length;
       if (len > 2) {
-        ops.add(Op.move(Point(
+        ops.add(Op.move(PointD(
           points[0].x + config.drawConfig.offsetSymmetric(offset),
           points[0].y + config.drawConfig.offsetSymmetric(offset),
         )));

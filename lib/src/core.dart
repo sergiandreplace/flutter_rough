@@ -1,26 +1,25 @@
 import 'dart:math';
 
-import 'package:rough/src/config.dart';
-
+import 'entities.dart';
 import 'geometry.dart';
 
 class Op {
   final OpType op;
-  final List<Point> data;
+  final List<PointD> data;
 
   Op._(this.op, this.data);
 
-  Op.move(Point point)
-      : this.op = OpType.move,
-        this.data = [point];
+  Op.move(PointD point)
+      : op = OpType.move,
+        data = [point];
 
-  Op.lineTo(Point point)
-      : this.op = OpType.lineTo,
-        this.data = [point];
+  Op.lineTo(PointD point)
+      : op = OpType.lineTo,
+        data = [point];
 
-  Op.curveTo(Point control1, Point control2, Point destination)
-      : this.op = OpType.curveTo,
-        this.data = [control1, control2, destination];
+  Op.curveTo(PointD control1, PointD control2, PointD destination)
+      : op = OpType.curveTo,
+        data = [control1, control2, destination];
 }
 
 class OpSet {
@@ -28,14 +27,6 @@ class OpSet {
   List<Op> ops;
 
   OpSet({this.type, this.ops});
-}
-
-class Drawable {
-  String shape;
-  DrawConfig options;
-  List<OpSet> sets;
-
-  Drawable({this.shape, this.options, this.sets});
 }
 
 enum OpType { move, curveTo, lineTo }
@@ -47,7 +38,7 @@ class Line {
 
   Line(this.source, this.target);
 
-  get length => sqrt(pow(source.x - target.x, 2) + pow(source.y - target.y, 2));
+  double get length => sqrt(pow(source.x - target.x, 2) + pow(source.y - target.y, 2));
 
   bool onSegment(PointD point) => (point.x <= max(source.x, target.x) &&
       point.x >= min(source.x, target.x) &&
@@ -65,22 +56,22 @@ class Line {
     }
     // source, target and line.source are colinear and line.source lies on segment this.source-this.target
 
-    if (o1 == PointsOrientation.collinear && onSegmentPoints(this.source, line.source, this.target)) {
+    if (o1 == PointsOrientation.collinear && onSegmentPoints(source, line.source, target)) {
       return true;
     }
 
-    // this.source, this.target and line.source are collinear and line.target lies on segment this.source-this.target
-    if (o2 == PointsOrientation.collinear && onSegmentPoints(this.source, line.target, this.target)) {
+    // source, target and line.source are collinear and line.target lies on segment source-target
+    if (o2 == PointsOrientation.collinear && onSegmentPoints(source, line.target, target)) {
       return true;
     }
 
-    // line.source, line.target and this.source are collinear and this.source lies on segment line.source-line.target
-    if (o3 == PointsOrientation.collinear && onSegmentPoints(line.source, this.source, line.target)) {
+    // line.source, line.target and source are collinear and source lies on segment line.source-line.target
+    if (o3 == PointsOrientation.collinear && onSegmentPoints(line.source, source, line.target)) {
       return true;
     }
 
-    // line.source, line.target and this.target are collinear and this.target lies on segment line.source-line.target
-    if (o4 == PointsOrientation.collinear && onSegmentPoints(line.source, this.target, line.target)) {
+    // line.source, line.target and target are collinear and target lies on segment line.source-line.target
+    if (o4 == PointsOrientation.collinear && onSegmentPoints(line.source, target, line.target)) {
       return true;
     }
     return false;
@@ -99,39 +90,7 @@ class Line {
         : null;
   }
 
-  bool isMidPointInPolygon(List<Point> polygon) {
+  bool isMidPointInPolygon(List<PointD> polygon) {
     return PointD((source.x + target.x) / 2, (source.y + target.y) / 2).isInPolygon(polygon);
-  }
-}
-
-class PointD extends Point<double> {
-  PointD(double x, double y) : super(x, y);
-
-  bool isInPolygon(List<Point> points) {
-    int vertices = points.length;
-
-    // There must be at least 3 vertices in polygon
-    if (vertices < 3) {
-      return false;
-    }
-    PointD extreme = PointD(double.maxFinite, y);
-    int count = 0;
-    for (int i = 0; i < vertices; i++) {
-      Point current = points[i];
-      Point next = points[(i + 1) % vertices];
-      if (Line(current, next).intersects(Line(this, extreme))) {
-        if (getOrientation(current, this, next) == PointsOrientation.collinear) {
-          return Line(current, next).onSegment(this);
-        }
-        count++;
-      }
-    }
-    // true if count is off
-    return count % 2 == 1;
-  }
-
-  @override
-  String toString() {
-    return 'PointD{x:$x, y:$y}';
   }
 }
