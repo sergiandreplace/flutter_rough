@@ -22,44 +22,32 @@ class InteractiveBody extends StatefulWidget {
 
 class _InteractiveBodyState extends State<InteractiveBody> {
   double roughness;
-  double maxRandomnessOffset;
-  double bowing;
   double curveFitting;
   double curveTightness;
   double curveStepCount;
-  Shape shape;
 
   DrawConfig drawConfig;
 
   @override
   void initState() {
     super.initState();
-    maxRandomnessOffset = DrawConfig.defaultValues.maxRandomnessOffset;
     roughness = DrawConfig.defaultValues.roughness;
-    bowing = DrawConfig.defaultValues.bowing;
     curveFitting = DrawConfig.defaultValues.curveFitting;
     curveTightness = DrawConfig.defaultValues.curveTightness;
     curveStepCount = DrawConfig.defaultValues.curveStepCount;
-    shape = Shape.circle;
   }
 
   updateState({
     double roughness,
-    double maxRandomnessOffset,
-    double bowing,
     double curveFitting,
     double curveTightness,
     double curveStepCount,
-    Shape shape,
   }) {
     setState(() {
       this.roughness = roughness ?? this.roughness;
-      this.maxRandomnessOffset = maxRandomnessOffset ?? this.maxRandomnessOffset;
-      this.bowing = bowing ?? this.bowing;
       this.curveFitting = curveFitting ?? this.curveFitting;
       this.curveTightness = curveTightness ?? this.curveTightness;
       this.curveStepCount = curveStepCount ?? this.curveStepCount;
-      this.shape = shape ?? this.shape;
     });
   }
 
@@ -72,10 +60,7 @@ class _InteractiveBodyState extends State<InteractiveBody> {
         Expanded(
           child: Card(
             child: CircleCanvas(
-              shape: shape,
               roughness: roughness,
-              maxRandomnessOffset: maxRandomnessOffset,
-              bowing: bowing,
               curveFitting: curveFitting,
               curveTightness: curveTightness,
               curveStepCount: curveStepCount,
@@ -83,27 +68,9 @@ class _InteractiveBodyState extends State<InteractiveBody> {
           ),
         ),
         Container(
-          height: 292,
+          height: 200,
           child: ListView(
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24),
-                child: Row(
-                  children: <Widget>[
-                    Text("shape:"),
-                    DropdownButton(
-                      value: this.shape,
-                      items: <Shape>[Shape.circle, Shape.square].map((Shape value) {
-                        return new DropdownMenuItem<Shape>(
-                          value: value,
-                          child: new Text(value.toString()),
-                        );
-                      }).toList(),
-                      onChanged: (value) => updateState(shape: value),
-                    )
-                  ],
-                ),
-              ),
               ConfigSlider(
                 label: "roughness",
                 value: roughness,
@@ -111,22 +78,6 @@ class _InteractiveBodyState extends State<InteractiveBody> {
                 max: 2,
                 steps: 50,
                 onChange: (value) => updateState(roughness: value),
-              ),
-              ConfigSlider(
-                label: "maxRandomnessOffset",
-                min: 0,
-                max: 10,
-                steps: 50,
-                value: maxRandomnessOffset,
-                onChange: (value) => updateState(maxRandomnessOffset: value),
-              ),
-              ConfigSlider(
-                label: "bowing",
-                value: bowing,
-                min: 0,
-                max: 2,
-                steps: 50,
-                onChange: (value) => updateState(bowing: value),
               ),
               ConfigSlider(
                 label: "curveFitting",
@@ -160,19 +111,13 @@ class _InteractiveBodyState extends State<InteractiveBody> {
 
 class CircleCanvas extends StatelessWidget {
   final double roughness;
-  final double maxRandomnessOffset;
-  final double bowing;
   final double curveFitting;
   final double curveTightness;
   final double curveStepCount;
-  final Shape shape;
 
   const CircleCanvas({
     Key key,
-    this.shape,
     this.roughness,
-    this.maxRandomnessOffset,
-    this.bowing,
     this.curveFitting,
     this.curveTightness,
     this.curveStepCount,
@@ -183,10 +128,7 @@ class CircleCanvas extends StatelessWidget {
     return CustomPaint(
       size: Size.square(double.infinity),
       painter: CirclePainter(
-        this.shape,
         this.roughness,
-        this.maxRandomnessOffset,
-        this.bowing,
         this.curveFitting,
         this.curveTightness,
         this.curveStepCount,
@@ -197,12 +139,9 @@ class CircleCanvas extends StatelessWidget {
 
 class CirclePainter extends CustomPainter {
   final double roughness;
-  final double maxRandomnessOffset;
-  final double bowing;
   final double curveFitting;
   final double curveTightness;
   final double curveStepCount;
-  final Shape shape;
   final Paint pathPaint = Paint()
     ..color = Colors.red
     ..style = PaintingStyle.stroke
@@ -215,10 +154,7 @@ class CirclePainter extends CustomPainter {
     ..strokeWidth = 1;
 
   CirclePainter(
-    this.shape,
     this.roughness,
-    this.maxRandomnessOffset,
-    this.bowing,
     this.curveFitting,
     this.curveTightness,
     this.curveStepCount,
@@ -227,24 +163,10 @@ class CirclePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     DrawConfig drawConfig = DrawConfig.build(
-        roughness: roughness,
-        maxRandomnessOffset: maxRandomnessOffset,
-        bowing: bowing,
-        curveFitting: curveFitting,
-        curveTightness: curveTightness,
-        curveStepCount: curveStepCount,
-        seed: 1);
+        roughness: roughness, curveFitting: curveFitting, curveTightness: curveTightness, curveStepCount: curveStepCount, seed: 1);
     Generator generator = Generator(drawConfig, NoFiller(FillerConfig().copyWith(drawConfig: drawConfig)));
-    Drawable figure;
     double s = min(size.width, size.height);
-    switch (shape) {
-      case Shape.circle:
-        figure = generator.circle(size.width / 2, size.height / 2, s * 0.8);
-        break;
-      case Shape.square:
-        figure = generator.rectangle(s * 0.1, s * 0.1, s * 0.8, s * 0.8);
-        break;
-    }
+    Drawable figure = generator.circle(size.width / 2, size.height / 2, s * 0.8);
     Rough().draw(canvas, figure, pathPaint, fillPaint);
   }
 

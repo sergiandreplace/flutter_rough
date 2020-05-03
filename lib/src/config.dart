@@ -1,12 +1,12 @@
 import 'dart:math';
 
 class DrawConfig {
-  final double maxRandomnessOffset; //renderer
-  final double roughness; //renderer
-  final double bowing; //renderer
-  final double curveFitting; //renderer
-  final double curveTightness; //renderer
-  final double curveStepCount; //renderer
+  final double maxRandomnessOffset; //line + solidFiller
+  final double roughness; //everything
+  final double bowing; //line
+  final double curveFitting; //ellipse
+  final double curveTightness; //curve
+  final double curveStepCount; //generateEllipseParams
   final int seed;
   final Randomizer randomizer;
 

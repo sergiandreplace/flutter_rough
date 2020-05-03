@@ -34,15 +34,20 @@ class _ConfigSliderState extends State<ConfigSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: <Widget>[
-        Text("${widget.label}: ${configValue.toStringAsFixed(1)}"),
-        Slider(
-          value: configValue,
-          divisions: widget.steps,
-          min: widget.min,
-          max: widget.max,
-          onChanged: (value) => onConfigValueChange(value),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Text("${widget.label}: ${configValue.toStringAsFixed(1)}"),
+        ),
+        Expanded(
+          child: Slider(
+            value: configValue,
+            divisions: widget.steps,
+            min: widget.min,
+            max: widget.max,
+            onChanged: (value) => onConfigValueChange(value),
+          ),
         )
       ],
     );
