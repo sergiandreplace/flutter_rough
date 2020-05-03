@@ -173,6 +173,12 @@ class OpSetBuilder {
     points..add(PointD(center.x + radiusX * cos(stop), center.y + radiusY * sin(stop)))..add(center);
     return points;
   }
+
+  static OpSet curve(List<PointD> points, DrawConfig config) {
+    List<Op> op1 = OpsGenerator.curveWithOffset(points, 1 * (1 + config.roughness * 0.2), config);
+    List<Op> op2 = OpsGenerator.curveWithOffset(points, 1.5 * (1 + config.roughness * 0.2), config);
+    return OpSet(type: OpSetType.path, ops: op1 + op2);
+  }
 }
 
 class OpsGenerator {
@@ -205,6 +211,24 @@ class OpsGenerator {
       return doubleLine(points[0].x, points[0].y, points[1].x, points[1].y, config);
     }
     return [];
+  }
+
+  static List<Op> curveWithOffset(List<PointD> points, double offset, DrawConfig config) {
+    List<PointD> result = [];
+    result.add(PointD(
+      points.first.x + config.offsetSymmetric(offset),
+      points.first.y + config.offsetSymmetric(offset),
+    ));
+    points.forEach((point) => result.add(PointD(
+          point.x + config.offsetSymmetric(offset),
+          point.y + config.offsetSymmetric(offset),
+        )));
+
+    result.add(PointD(
+      points.last.x + config.offsetSymmetric(offset),
+      points.last.y + config.offsetSymmetric(offset),
+    ));
+    return curve(result, config);
   }
 
   static List<Op> arc(

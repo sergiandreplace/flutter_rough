@@ -11,7 +11,7 @@ class Generator {
 
   Generator(this.config, this.filler);
 
-  Drawable _buildDrawable(OpSet drawSets, [List<PointD> fillPoints = const []]) {
+  Drawable _buildDrawable(OpSet drawSets, [List<PointD> fillPoints]) {
     final List<OpSet> sets = [];
     if (fillPoints != null) {
       sets.add(filler.fill(fillPoints));
@@ -42,13 +42,17 @@ class Generator {
   }
 
   Drawable linearPath(List<PointD> points) {
-    return _buildDrawable(OpSetBuilder.linearPath(points, false, config));
+    return _buildDrawable(OpSetBuilder.linearPath(points, true, config));
   }
 
   Drawable arc(double x, double y, double width, double height, double start, double stop, [bool closed = false]) {
     OpSet outline = OpSetBuilder.arc(PointD(x, y), width, height, start, stop, closed, true, config);
     List<PointD> fillPoints = OpSetBuilder.arcPolygon(PointD(x, y), width, height, start, stop, config);
     return _buildDrawable(outline, fillPoints);
+  }
+
+  Drawable curvePath(List<PointD> points) {
+    return _buildDrawable(OpSetBuilder.curve(points, config));
   }
 
   Drawable polygon(List<PointD> points) {
