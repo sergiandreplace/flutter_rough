@@ -180,7 +180,7 @@ EllipseResult ellipseWithParams(double x, double y, DrawConfig config, EllipsePa
   );
   List<Op> o1 = OpsGenerator.curve(ellipsePoints1.allPoints, config);
   List<Op> o2 = OpsGenerator.curve(ellipsePoints2.allPoints, config);
-  return EllipseResult(estimatedPoints: ellipsePoints1.corePoints, opset: OpSet(type: OpSetType.path, ops: o1)); //+ o2));
+  return EllipseResult(estimatedPoints: ellipsePoints1.corePoints, opset: OpSet(type: OpSetType.path, ops: o1 + o2));
 }
 
 ComputedEllipsePoints _computeEllipsePoints({
