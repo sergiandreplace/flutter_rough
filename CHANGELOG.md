@@ -1,3 +1,4 @@
-## [0.0.1] - TODO: Add release date.
+## [0.0.1] - 2020-May-5.
 
-* TODO: Describe initial release.
+* Initial release
+* support for circles and rectangles with some fillings.
