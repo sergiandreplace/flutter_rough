@@ -90,9 +90,14 @@ abstract class Filler {
       for (int i = 0; i < vertices.length - 1; i++) {
         PointD p1 = vertices[i];
         PointD p2 = vertices[i + 1];
-        if (p1.x != p2.x) {
+        if (p1.y != p2.y) {
           double yMin = min(p1.y, p2.y);
-          edges.add(Edge(yMin: yMin, yMax: max(p1.y, p2.y), x: yMin == p1.y ? p1.x : p2.x, isLope: (p2.x - p1.x) / (p2.y - p1.y)));
+          edges.add(Edge(
+            yMin: yMin,
+            yMax: max(p1.y, p2.y),
+            x: yMin == p1.y ? p1.x : p2.x,
+            slope: (p2.x - p1.x) / (p2.y - p1.y),
+          ));
         }
       }
       edges.sort((e1, e2) {
@@ -154,7 +159,7 @@ abstract class Filler {
 
         y += gap;
         activeEdges = activeEdges.map((ae) {
-          return ActiveEdge(ae.s, ae.edge.copyWith(x: ae.edge.x + (gap * ae.edge.isLope)));
+          return ActiveEdge(ae.s, ae.edge.copyWith(x: ae.edge.x + (gap * ae.edge.slope)));
         }).toList();
       }
     }
@@ -335,7 +340,7 @@ class DotFiller extends Filler {
   OpSet fill(List<PointD> points) {
     FillerConfig dotConfig = config.copyWith(
       drawConfig: config.drawConfig.copyWith(curveStepCount: 4, roughness: 1),
-      hachureAngle: 0,
+      hachureAngle: 1,
     );
     List<Line> lines = buildFillLines(points, dotConfig);
     return dotsOnLines(lines, dotConfig);
@@ -343,21 +348,21 @@ class DotFiller extends Filler {
 
   OpSet dotsOnLines(List<Line> lines, FillerConfig config) {
     List<Op> ops = [];
-    double gap = config.hachureGap;
-    gap = max(gap, 0.1);
-    double ro = gap / 4;
+    final double gap = max(config.hachureGap, 0.1);
+    final double fWeight = max(config.fillWeight, 0.1);
+    final double ro = gap / 4;
     lines.forEach((line) {
-      double length = line.length;
-      double dl = length / gap;
-      int count = dl.ceil() - 1;
-      double off = length - (count * gap);
-      double x = ((line.source.x + line.target.x) / 2) - (gap / 4);
-      double minY = min(line.source.y, line.target.y);
+      final double length = line.length;
+      final double dl = length / gap;
+      final int count = dl.ceil() - 1;
+      final double off = length - (count * gap);
+      final double x = ((line.source.x + line.target.x) / 2) - (gap / 4);
+      final double minY = min(line.source.y, line.target.y);
       for (int i = 0; i < count; i++) {
         double y = minY + off + (i * gap);
         double cx = config.drawConfig.offset(x - ro, x + ro);
         double cy = config.drawConfig.offset(y - ro, y + ro);
-        OpSet el = OpSetBuilder.ellipse(cx, cy, config.fillWeight, config.fillWeight, config.drawConfig);
+        OpSet el = OpSetBuilder.ellipse(cx, cy, fWeight, fWeight, config.drawConfig);
         ops.addAll(el.ops);
       }
     });

@@ -44,16 +44,14 @@ class FlutterLogoPainter extends InteractivePainter {
   @override
   void paintRough(canvas, size) {
     FillerConfig fillerConfig = FillerConfig(
-//      hachureAngle: 80,
-//      dashGap: 3,
-//      dashOffset: 1,
+      hachureAngle: 40,
       drawConfig: drawConfig,
-//      fillWeight: 10,
-      hachureGap: 3,
+      fillWeight: 100,
+      hachureGap: 4,
 //      zigzagOffset: 10,
     );
 
-    Generator gen = Generator(drawConfig, DotFiller(fillerConfig));
+    Generator gen = Generator(drawConfig, HachureFiller(fillerConfig));
     double logoWidth = 165;
     double logoHeight = 201;
     double widthScale = (size.width) / (logoWidth);

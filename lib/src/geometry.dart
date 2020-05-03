@@ -62,20 +62,20 @@ class Edge {
   double yMin;
   double yMax;
   double x;
-  double isLope;
+  double slope;
 
-  Edge({this.yMin, this.yMax, this.x, this.isLope});
+  Edge({this.yMin, this.yMax, this.x, this.slope});
 
   Edge copyWith({double yMin, double yMax, double x, double isLope}) => Edge(
         yMin: yMin ?? this.yMin,
         yMax: yMax ?? this.yMax,
         x: x ?? this.x,
-        isLope: isLope ?? this.isLope,
+        slope: isLope ?? this.slope,
       );
 
   @override
   String toString() {
-    return 'Edge{yMin: $yMin, yMax: $yMax, x: $x, isLope: $isLope}';
+    return 'Edge{yMin: $yMin, yMax: $yMax, x: $x, isLope: $slope}';
   }
 }
 
