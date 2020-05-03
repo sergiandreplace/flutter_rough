@@ -8,14 +8,14 @@ class InteractiveRectanglePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Interactive rectangle demo")),
+      appBar: AppBar(title: const Text('Interactive rectangle demo')),
       body: InteractiveBody(
-        painterbuilder: (drawConfig) => Rectangle(drawConfig),
+        painterBuilder: (drawConfig) => Rectangle(drawConfig),
         properties: <DiscreteProperty>[
-          DiscreteProperty(name: "seed", label: "Seed", min: 0, max: 50, steps: 50),
-          DiscreteProperty(name: "roughness", label: "Roughness", min: 0, max: 5, steps: 50),
-          DiscreteProperty(name: "bowing", label: "Bowing", min: 0, max: 10, steps: 50),
-          DiscreteProperty(name: "maxRandomnessOffset", label: "maxRandomnessOffset", min: 0, max: 10, steps: 50),
+          DiscreteProperty(name: 'seed', label: 'Seed', min: 0, max: 50, steps: 50),
+          DiscreteProperty(name: 'roughness', label: 'Roughness', min: 0, max: 5, steps: 50),
+          DiscreteProperty(name: 'bowing', label: 'Bowing', min: 0, max: 10, steps: 50),
+          DiscreteProperty(name: 'maxRandomnessOffset', label: 'maxRandomnessOffset', min: 0, max: 10, steps: 50),
         ],
       ),
     );
@@ -39,7 +39,7 @@ class Rectangle extends InteractivePainter {
 
   @override
   void paintRough(Canvas canvas, Size size) {
-    Generator generator = Generator(drawConfig, NoFiller(FillerConfig().copyWith(drawConfig: drawConfig)));
+    Generator generator = Generator(drawConfig, NoFiller(const FillerConfig().copyWith(drawConfig: drawConfig)));
 
     Drawable figure = generator.rectangle(size.width * 0.1, size.height * 0.2, size.width * 0.8, size.height * 0.6);
     Rough().draw(canvas, figure, pathPaint, fillPaint);

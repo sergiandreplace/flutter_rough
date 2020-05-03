@@ -9,14 +9,14 @@ class FlutterLogoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Interactive Flutter Logo")),
+      appBar: AppBar(title: const Text('Interactive Flutter Logo')),
       body: InteractiveBody(
-        painterbuilder: (drawConfig) => FlutterLogoPainter(drawConfig),
+        painterBuilder: (drawConfig) => FlutterLogoPainter(drawConfig),
         properties: <DiscreteProperty>[
-          DiscreteProperty(name: "seed", label: "Seed", min: 0, max: 50, steps: 50),
-          DiscreteProperty(name: "roughness", label: "Roughness", min: 0, max: 5, steps: 50),
-          DiscreteProperty(name: "bowing", label: "Bowing", min: 0, max: 10, steps: 50),
-          DiscreteProperty(name: "maxRandomnessOffset", label: "maxRandomnessOffset", min: 0, max: 10, steps: 50),
+          DiscreteProperty(name: 'seed', label: 'Seed', min: 0, max: 50, steps: 50),
+          DiscreteProperty(name: 'roughness', label: 'Roughness', min: 0, max: 5, steps: 50),
+          DiscreteProperty(name: 'bowing', label: 'Bowing', min: 0, max: 10, steps: 50),
+          DiscreteProperty(name: 'maxRandomnessOffset', label: 'maxRandomnessOffset', min: 0, max: 10, steps: 50),
         ],
       ),
     );
@@ -60,8 +60,9 @@ class FlutterLogoPainter extends InteractivePainter {
     double translateX = (size.width - logoWidth * scale) / 2;
     double translateY = (size.height - logoHeight * scale) / 2;
 
-    canvas.translate(translateX, translateY);
-    canvas.scale(scale);
+    canvas
+      ..translate(translateX, translateY)
+      ..scale(scale);
     rough.draw(canvas, gen.polygon([PointD(37, 128), PointD(9, 101), PointD(100, 10), PointD(156, 10)]), stroke, fillPaint);
     canvas.translate(-4, -4);
     rough.draw(canvas, gen.polygon([PointD(156, 94), PointD(100, 94), PointD(50, 141), PointD(79, 170)]), stroke, fillPaint);

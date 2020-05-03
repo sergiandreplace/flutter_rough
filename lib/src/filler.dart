@@ -165,19 +165,6 @@ abstract class Filler {
     }
     return lines;
   }
-}
-
-class NoFiller extends Filler {
-  NoFiller([FillerConfig config = const FillerConfig()]) : super(config);
-
-  @override
-  OpSet fill(List<PointD> points) {
-    return OpSet(type: OpSetType.fillSketch, ops: []);
-  }
-}
-
-abstract class BaseLineFiller extends Filler {
-  BaseLineFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
   OpSet fillPolygon(List<PointD> points, FillerConfig config, bool connectEnds) {
     List<Line> lines = buildFillLines(points, config);
@@ -187,6 +174,30 @@ abstract class BaseLineFiller extends Filler {
     }
     List<Op> ops = renderLines(lines, config);
     return OpSet(type: OpSetType.fillSketch, ops: ops);
+  }
+
+  OpSet fillArc(PointD center, double width, double height, double startAngle, double stopAngle) {
+    double radiusX = (width / 2).abs();
+    double radiusY = (height / 2).abs();
+    radiusX += config.drawConfig.offsetSymmetric(radiusX * 0.01);
+    radiusY += config.drawConfig.offsetSymmetric(radiusY * 0.01);
+    double start = startAngle;
+    double stop = stopAngle;
+    while (start < 0) {
+      start += pi * 2;
+      stop += pi * 2;
+    }
+    if ((stop - start) > (pi * 2)) {
+      start = 0;
+      stop = pi * 2;
+    }
+    final double increment = (stop - start) / config.drawConfig.curveStepCount;
+    List<PointD> points = [];
+    for (double angle = start; angle <= stop; angle = angle + increment) {
+      points.add(PointD(center.x + radiusX + cos(angle), center.y + radiusY + sin(angle)));
+    }
+    points..add(PointD(center.x + radiusX * cos(stop), center.y + radiusY * sin(stop)))..add(center);
+    return fill(points);
   }
 
   List<Line> connectLines(List<PointD> polygon, List<Line> lines) {
@@ -275,7 +286,16 @@ abstract class BaseLineFiller extends Filler {
   }
 }
 
-class HachureFiller extends BaseLineFiller {
+class NoFiller extends Filler {
+  NoFiller([FillerConfig config = const FillerConfig()]) : super(config);
+
+  @override
+  OpSet fill(List<PointD> points) {
+    return OpSet(type: OpSetType.fillSketch, ops: []);
+  }
+}
+
+class HachureFiller extends Filler {
   HachureFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
   @override
@@ -284,7 +304,7 @@ class HachureFiller extends BaseLineFiller {
   }
 }
 
-class ZigZagFiller extends BaseLineFiller {
+class ZigZagFiller extends Filler {
   ZigZagFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
   @override
@@ -293,7 +313,7 @@ class ZigZagFiller extends BaseLineFiller {
   }
 }
 
-class HatchFiller extends BaseLineFiller {
+class HatchFiller extends Filler {
   HatchFiller([FillerConfig config = const FillerConfig()]) : super(config);
 
   @override

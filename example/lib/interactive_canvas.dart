@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:rough/rough.dart';
 
@@ -14,32 +16,32 @@ class DiscreteProperty {
 typedef PainterBuilder = InteractivePainter Function(DrawConfig);
 
 class InteractiveBody extends StatefulWidget {
-  final PainterBuilder painterbuilder;
+  final PainterBuilder painterBuilder;
   final List<DiscreteProperty> properties;
 
-  const InteractiveBody({Key key, this.painterbuilder, this.properties}) : super(key: key);
+  const InteractiveBody({Key key, this.painterBuilder, this.properties}) : super(key: key);
 
   @override
   _InteractiveBodyState createState() => _InteractiveBodyState();
 }
 
 class _InteractiveBodyState extends State<InteractiveBody> {
-  Map<String, double> propertyValues = Map<String, double>();
+  Map<String, double> propertyValues = HashMap<String, double>();
   DrawConfig drawConfig;
 
   @override
   void initState() {
     super.initState();
-    propertyValues["maxRandomnessOffset"] = DrawConfig.defaultValues.roughness;
-    propertyValues["bowing"] = DrawConfig.defaultValues.roughness;
-    propertyValues["roughness"] = DrawConfig.defaultValues.roughness;
-    propertyValues["curveFitting"] = DrawConfig.defaultValues.curveFitting;
-    propertyValues["curveTightness"] = DrawConfig.defaultValues.curveTightness;
-    propertyValues["curveStepCount"] = DrawConfig.defaultValues.curveStepCount;
-    propertyValues["seed"] = DrawConfig.defaultValues.seed.toDouble();
+    propertyValues['maxRandomnessOffset'] = DrawConfig.defaultValues.roughness;
+    propertyValues['bowing'] = DrawConfig.defaultValues.roughness;
+    propertyValues['roughness'] = DrawConfig.defaultValues.roughness;
+    propertyValues['curveFitting'] = DrawConfig.defaultValues.curveFitting;
+    propertyValues['curveTightness'] = DrawConfig.defaultValues.curveTightness;
+    propertyValues['curveStepCount'] = DrawConfig.defaultValues.curveStepCount;
+    propertyValues['seed'] = DrawConfig.defaultValues.seed.toDouble();
   }
 
-  updateState({
+  void updateState({
     String property,
     double value,
   }) {
@@ -51,13 +53,13 @@ class _InteractiveBodyState extends State<InteractiveBody> {
   @override
   Widget build(BuildContext context) {
     DrawConfig drawConfig = DrawConfig.build(
-        maxRandomnessOffset: propertyValues["maxRandomnessOffset"],
-        bowing: propertyValues["bowing"],
-        roughness: propertyValues["roughness"],
-        curveFitting: propertyValues["curveFitting"],
-        curveTightness: propertyValues["curveTightness"],
-        curveStepCount: propertyValues["curveStepCount"],
-        seed: propertyValues["seed"].floor());
+        maxRandomnessOffset: propertyValues['maxRandomnessOffset'],
+        bowing: propertyValues['bowing'],
+        roughness: propertyValues['roughness'],
+        curveFitting: propertyValues['curveFitting'],
+        curveTightness: propertyValues['curveTightness'],
+        curveStepCount: propertyValues['curveStepCount'],
+        seed: propertyValues['seed'].floor());
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -65,7 +67,7 @@ class _InteractiveBodyState extends State<InteractiveBody> {
         Expanded(
           child: Card(
             child: InteractiveCanvas(
-              painter: widget.painterbuilder(drawConfig),
+              painter: widget.painterBuilder(drawConfig),
             ),
           ),
         ),
@@ -114,7 +116,7 @@ class _PropertySliderState extends State<PropertySlider> {
     configValue = widget.value;
   }
 
-  onConfigValueChange(double value) {
+  void onConfigValueChange(double value) {
     if (configValue != value) {
       setState(() {
         configValue = value;
@@ -129,7 +131,7 @@ class _PropertySliderState extends State<PropertySlider> {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(left: 16.0),
-          child: Text("${widget.label}: ${configValue.toStringAsFixed(1)}"),
+          child: Text('${widget.label}: ${configValue.toStringAsFixed(1)}'),
         ),
         Expanded(
           child: Slider(
@@ -137,7 +139,7 @@ class _PropertySliderState extends State<PropertySlider> {
             divisions: widget.steps,
             min: widget.min,
             max: widget.max,
-            onChanged: (value) => onConfigValueChange(value),
+            onChanged: onConfigValueChange,
           ),
         )
       ],
@@ -169,12 +171,14 @@ abstract class InteractivePainter extends CustomPainter {
 
   InteractivePainter(this.drawConfig);
 
+  @override
   paint(Canvas canvas, Size size) {
     paintRough(canvas, size);
   }
 
-  paintRough(Canvas canvas, Size size);
+  void paintRough(Canvas canvas, Size size);
 
+  @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
   }

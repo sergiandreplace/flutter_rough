@@ -6,13 +6,13 @@ import 'package:rough/rough.dart';
 
 import '../interactive_canvas.dart';
 
-class InteractiveCirclePage extends StatelessWidget {
+class InteractiveArcPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Interactive circle demo')),
       body: InteractiveBody(
-        painterBuilder: (drawConfig) => CirclePainter(drawConfig),
+        painterBuilder: (drawConfig) => ArcPainter(drawConfig),
         properties: <DiscreteProperty>[
           DiscreteProperty(name: 'seed', label: 'Seed', min: 0, max: 50, steps: 50),
           DiscreteProperty(name: 'roughness', label: 'Rougness', min: 0, max: 2, steps: 50),
@@ -25,7 +25,7 @@ class InteractiveCirclePage extends StatelessWidget {
   }
 }
 
-class CirclePainter extends InteractivePainter {
+class ArcPainter extends InteractivePainter {
   final Paint pathPaint = Paint()
     ..color = Colors.red
     ..style = PaintingStyle.stroke
@@ -37,13 +37,13 @@ class CirclePainter extends InteractivePainter {
     ..isAntiAlias = true
     ..strokeWidth = 1;
 
-  CirclePainter(DrawConfig drawConfig) : super(drawConfig);
+  ArcPainter(DrawConfig drawConfig) : super(drawConfig);
 
   @override
   void paintRough(Canvas canvas, Size size) {
     Generator generator = Generator(drawConfig, NoFiller(const FillerConfig().copyWith(drawConfig: drawConfig)));
     double s = min(size.width, size.height);
-    Drawable figure = generator.circle(size.width / 2, size.height / 2, s * 0.8);
+    Drawable figure = generator.arc(size.width / 2, size.height / 2, s * 0.8, s * 0.8, 0, pi * 1.8, true);
     Rough().draw(canvas, figure, pathPaint, fillPaint);
   }
 }

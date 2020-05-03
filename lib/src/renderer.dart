@@ -111,6 +111,42 @@ class OpSetBuilder {
       return OpSet(type: OpSetType.path, ops: []);
     }
   }
+
+  static OpSet arc(
+      PointD center, double width, double height, double start, double stop, bool closed, bool roughClosure, DrawConfig config) {
+    List<Op> ops = [];
+    double cx = center.x;
+    double cy = center.y;
+    double rx = (width / 2).abs();
+    double ry = (height / 2).abs();
+    rx += config.offsetSymmetric(rx * 0.01);
+    ry += config.offsetSymmetric(ry * 0.01);
+    double strt = start;
+    double stp = stop;
+    while (strt < 0) {
+      strt += pi * 2;
+      stp += pi * 2;
+    }
+    if ((stp - strt) > (pi * 2)) {
+      strt = 0;
+      stp = pi * 2;
+    }
+    double ellipseInc = pi * 2 / config.curveStepCount;
+    double arcIn = min(ellipseInc / 2, (stp - strt) / 2);
+    ops
+      ..addAll(OpsGenerator.arc(arcIn, cx, cy, rx, ry, strt, stp, 1, config))
+      ..addAll(OpsGenerator.arc(arcIn, cx, cy, rx, ry, strt, stp, 1.5, config));
+    if (closed) {
+      if (roughClosure) {
+        ops
+          ..addAll(OpsGenerator.doubleLine(cx, cy, cx + rx * cos(strt), cy + ry * sin(strt), config))
+          ..addAll(OpsGenerator.doubleLine(cx, cy, cx + rx * cos(stp), cy + ry * sin(stp), config));
+      } else {
+        ops..add(Op.lineTo(PointD(cx, cy)))..add(Op.lineTo(PointD(cx + rx * cos(strt), cy + ry * sin(strt))));
+      }
+    }
+    return OpSet(type: OpSetType.path, ops: ops);
+  }
 }
 
 class OpsGenerator {
@@ -135,14 +171,32 @@ class OpsGenerator {
         final control2 = PointD(next.x + (s * point.x - s * afterNext.x) / 6, next.y + (s * point.y - s * afterNext.y) / 6);
         final end = PointD(next.x, next.y);
         ops.add(Op.curveTo(control1, control2, end));
-        return ops;
       }
+      return ops;
     } else if (len == 3) {
       return []..add(Op.move(points[1]))..add(Op.curveTo(points[1], points[2], points[2]));
     } else if (len == 2) {
       return doubleLine(points[0].x, points[0].y, points[1].x, points[1].y, config);
     }
     return [];
+  }
+
+  static List<Op> arc(
+      double increment, double cx, double cy, double rx, double ry, double strt, double stp, double offset, DrawConfig config) {
+    List<PointD> points = [];
+    double radOffset = strt + config.offsetSymmetric(0.1);
+    points.add(PointD(
+      config.offsetSymmetric(offset) + cx + 0.9 * rx * cos(radOffset - increment),
+      config.offsetSymmetric(offset) + cy + 0.9 * ry * sin(radOffset - increment),
+    ));
+    for (double angle = radOffset; angle <= stp; angle += increment) {
+      points.add(PointD(
+        config.offsetSymmetric(offset) + cx + rx * cos(angle),
+        config.offsetSymmetric(offset) + cy + ry * sin(angle),
+      ));
+    }
+    points..add(PointD(cx + rx * cos(stp), cy + ry * sin(stp)))..add(PointD(cx + rx * cos(stp), cy + ry * sin(stp)));
+    return curve(points, config);
   }
 }
 

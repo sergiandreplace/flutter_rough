@@ -7,7 +7,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Flutter Rough example")),
+      appBar: AppBar(title: const Text('Flutter Rough example')),
       body: DemoList(),
     );
   }
@@ -20,7 +20,7 @@ class DemoList extends StatelessWidget {
       child: ListView.separated(
         separatorBuilder: (context, position) => Container(
           color: Theme.of(context).cardColor,
-          child: Divider(
+          child: const Divider(
             indent: 64,
             thickness: 1,
             height: 4,
@@ -43,7 +43,7 @@ class DemoRow extends StatelessWidget {
     return Container(
       color: Theme.of(context).cardColor,
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         title: Text(demo.name),
         dense: false,
         subtitle: Text(demo.description),
@@ -52,7 +52,7 @@ class DemoRow extends StatelessWidget {
           width: 42,
           height: 42,
         ),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: demo.launcher)),
+        onTap: () => Navigator.push<MaterialPageRoute>(context, MaterialPageRoute(builder: demo.launcher)),
       ),
     );
   }

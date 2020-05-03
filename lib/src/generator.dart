@@ -45,6 +45,12 @@ class Generator {
     return _buildDrawable(OpSetBuilder.linearPath(points, false, config));
   }
 
+  Drawable arc(double x, double y, double width, double height, double start, double stop, [bool closed = false]) {
+    OpSet outline = OpSetBuilder.arc(PointD(x, y), width, height, start, stop, closed, true, config);
+
+    return _buildDrawable(outline, []);
+  }
+
   Drawable polygon(List<PointD> points) {
     var path = OpSetBuilder.linearPath(points, true, config);
     return _buildDrawable(path, points);
