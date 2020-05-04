@@ -1,0 +1,20 @@
+workflows:
+  my-workflow:
+    name: Release version
+    environment:
+      vars:
+        PUBLIC_ENV_VAR: "value here"
+      flutter: stable
+    cache:
+      cache_paths:
+        - ~/.pub-cache
+    triggering:
+      events:
+        - tag
+      branch_patterns:
+        - pattern: 'test_codemagic'
+          include: true
+          source: true
+    scripts:
+      - flutter packages pub get
+      - flutter pub publish --dry-run
