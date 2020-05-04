@@ -3,7 +3,7 @@ workflows:
     name: Release version
     environment:
       vars:
-        PUBLIC_ENV_VAR: "value here"
+        CACHED_JSON: Encrypted(Z0FBQUFBQmRyY1FLWXIwVEhqdWphdjRhQ0xubkdoOGJ2bThkNmh4YmdXbFB3S2wyNTN2OERoV3c0YWU0OVBERG42d3Rfc2N0blNDX3FfblZxbUc4d2pWUHJBSVppbXNXNC04U1VqcGlnajZ2VnJVMVFWc3lZZ289)
       flutter: stable
     cache:
       cache_paths:
@@ -17,5 +17,6 @@ workflows:
           source: true
     scripts:
       - flutter packages pub get
+      - ./scripts/cache.sh
       - flutter pub publish --dry-run
       - flutter pub publish -f
