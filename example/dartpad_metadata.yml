@@ -1,0 +1,4 @@
+name: A library of Flutter Rough capabilities
+mode: flutter
+files:
+  - name: main.dart
