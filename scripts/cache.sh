@@ -1,5 +1,5 @@
 #!/bin/bash
-rm ~/.pub-cache/credentials.json
+mkdir ~/.pub-cache
 echo $CACHED_JSON > ~/.pub-cache/credentials.json
 echo "done"
 echo $CACHED_JSON
