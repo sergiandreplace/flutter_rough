@@ -1,8 +1,8 @@
 name: rough
 description: A Flutter implementation of the rough.js library
 version: 0.1.0
-author: Sergi Martínez (@sergiandreplace)
 homepage: https://github.com/sergiandreplace/flutter_rough
+repository: https://github.com/sergiandreplace/flutter_rough
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
