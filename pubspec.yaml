@@ -1,6 +1,6 @@
 name: rough
 description: A Flutter implementation of the rough.js library
-version: 0.1.0
+version: 0.1.0+1
 homepage: https://github.com/sergiandreplace/flutter_rough
 repository: https://github.com/sergiandreplace/flutter_rough
 
