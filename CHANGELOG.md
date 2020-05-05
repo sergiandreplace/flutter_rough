@@ -1,3 +1,8 @@
+## [0.1.0+2] - 2020-May-5.
+
+* Basic documentation
+* Cute badges!
+
 ## [0.1.0+1] - 2020-May-5.
 
 * Testing publication through CI
