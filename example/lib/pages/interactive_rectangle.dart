@@ -39,9 +39,9 @@ class Rectangle extends InteractivePainter {
 
   @override
   void paintRough(Canvas canvas, Size size) {
-    Generator generator = Generator(drawConfig, NoFiller(const FillerConfig().copyWith(drawConfig: drawConfig)));
+    Generator generator = Generator(drawConfig, NoFiller(FillerConfig.build().copyWith(drawConfig: drawConfig)));
 
     Drawable figure = generator.rectangle(size.width * 0.1, size.height * 0.2, size.width * 0.8, size.height * 0.6);
-    Rough().draw(canvas, figure, pathPaint, fillPaint);
+    canvas.drawRough(figure, pathPaint, fillPaint);
   }
 }

@@ -24,15 +24,42 @@ class FillerConfig {
   final double dashGap;
   final double zigzagOffset;
 
-  const FillerConfig({
+  const FillerConfig._({
     DrawConfig drawConfig,
-    this.fillWeight = 1,
-    this.hachureAngle = -41,
-    this.hachureGap = 15,
-    this.dashOffset = 15,
-    this.dashGap = 2,
-    this.zigzagOffset = 5,
+    this.fillWeight,
+    this.hachureAngle,
+    this.hachureGap,
+    this.dashOffset,
+    this.dashGap,
+    this.zigzagOffset,
   }) : _drawConfig = drawConfig;
+
+  /// * [fillWeigh] When using dots styles to fill the shape, this value represents the diameter of the dot.
+  /// * [hachureAngle] Numerical value (in degrees) that defines the angle of the hachure lines. Default value is -41 degrees.
+  /// * [hachureGap] Numerical value that defines the average gap, in pixels, between two hachure lines. Default value is 15.
+  /// * [dashOffset] When filling a shape using the [DashedFiller], this property indicates the nominal length of dash (in pixels). If not set, it defaults to the hachureGap value.
+  /// * [dashGap] When filling a shape using the [DashedFiller], this property indicates the nominal gap between dashes (in pixels). If not set, it defaults to the hachureGap value.
+  /// * [zigzagOffset] When filling a shape using the [ZigZagLineFiller], this property indicates the nominal width of the zig-zag triangle in each line. If not set, it defaults to the hachureGap value.
+  static FillerConfig build({
+    DrawConfig drawConfig,
+    double fillWeight = 1,
+    double hachureAngle = -41,
+    double hachureGap = 15,
+    double dashOffset = 15,
+    double dashGap = 2,
+    double zigzagOffset = 5,
+  }) =>
+      FillerConfig._(
+        drawConfig: drawConfig,
+        fillWeight: fillWeight,
+        hachureAngle: hachureAngle,
+        hachureGap: hachureGap,
+        dashOffset: dashOffset,
+        dashGap: dashGap,
+        zigzagOffset: zigzagOffset,
+      );
+
+  static FillerConfig defaultConfig = FillerConfig.build(drawConfig: DrawConfig.defaultValues);
 
   DrawConfig get drawConfig => _drawConfig;
 
@@ -45,7 +72,7 @@ class FillerConfig {
     double dashGap,
     double zigzagOffset,
   }) =>
-      FillerConfig(
+      FillerConfig._(
         drawConfig: drawConfig ?? _drawConfig,
         fillWeight: fillWeight ?? this.fillWeight,
         hachureAngle: hachureAngle ?? this.hachureAngle,
@@ -59,7 +86,7 @@ class FillerConfig {
 abstract class Filler {
   final FillerConfig config;
 
-  Filler(this.config);
+  Filler(this.config) : assert(config != null, 'FillerConfig could not be null');
 
   OpSet fill(List<PointD> points);
 
@@ -104,9 +131,9 @@ abstract class Filler {
           }
           List<Edge> removed = edges.sublist(0, ix + 1);
           edges.removeRange(0, ix + 1);
-          removed.forEach((edge) {
+          for (Edge edge in removed) {
             activeEdges.add(ActiveEdge(y, edge));
-          });
+          }
         }
         activeEdges = activeEdges.where((ae) => ae.edge.yMax > y).toList();
 
@@ -268,7 +295,7 @@ abstract class Filler {
 }
 
 class NoFiller extends Filler {
-  NoFiller([FillerConfig config = const FillerConfig()]) : super(config);
+  NoFiller([FillerConfig config]) : super(config);
 
   @override
   OpSet fill(List<PointD> points) {
@@ -277,7 +304,7 @@ class NoFiller extends Filler {
 }
 
 class HachureFiller extends Filler {
-  HachureFiller([FillerConfig config = const FillerConfig()]) : super(config);
+  HachureFiller([FillerConfig config]) : super(config);
 
   @override
   OpSet fill(List<PointD> points) {
@@ -286,7 +313,7 @@ class HachureFiller extends Filler {
 }
 
 class ZigZagFiller extends Filler {
-  ZigZagFiller([FillerConfig config = const FillerConfig()]) : super(config);
+  ZigZagFiller([FillerConfig config]) : super(config);
 
   @override
   OpSet fill(List<PointD> points) {
@@ -295,7 +322,7 @@ class ZigZagFiller extends Filler {
 }
 
 class HatchFiller extends Filler {
-  HatchFiller([FillerConfig config = const FillerConfig()]) : super(config);
+  HatchFiller([FillerConfig config]) : super(config);
 
   @override
   OpSet fill(List<PointD> points) {
@@ -307,7 +334,7 @@ class HatchFiller extends Filler {
 }
 
 class DashedFiller extends Filler {
-  DashedFiller([FillerConfig config = const FillerConfig()]) : super(config);
+  DashedFiller([FillerConfig config]) : super(config);
 
   @override
   OpSet fill(List<PointD> points) {
@@ -348,7 +375,7 @@ class DashedFiller extends Filler {
 }
 
 class DotFiller extends Filler {
-  DotFiller([FillerConfig config = const FillerConfig()]) : super(config);
+  DotFiller([FillerConfig config]) : super(config);
 
   @override
   OpSet fill(List<PointD> points) {
@@ -385,7 +412,7 @@ class DotFiller extends Filler {
 }
 
 class SolidFiller extends Filler {
-  SolidFiller([FillerConfig config = const FillerConfig()]) : super(config);
+  SolidFiller([FillerConfig config]) : super(config);
 
   @override
   OpSet fill(List<PointD> points) {

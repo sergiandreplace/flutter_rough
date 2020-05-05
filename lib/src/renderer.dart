@@ -214,20 +214,20 @@ class OpsGenerator {
   }
 
   static List<Op> curveWithOffset(List<PointD> points, double offset, DrawConfig config) {
-    List<PointD> result = [];
-    result.add(PointD(
-      points.first.x + config.offsetSymmetric(offset),
-      points.first.y + config.offsetSymmetric(offset),
-    ));
-    points.forEach((point) => result.add(PointD(
-          point.x + config.offsetSymmetric(offset),
-          point.y + config.offsetSymmetric(offset),
-        )));
-
-    result.add(PointD(
-      points.last.x + config.offsetSymmetric(offset),
-      points.last.y + config.offsetSymmetric(offset),
-    ));
+    List<PointD> result = [
+      PointD(
+        points.first.x + config.offsetSymmetric(offset),
+        points.first.y + config.offsetSymmetric(offset),
+      ),
+      ...points.map((point) => PointD(
+            point.x + config.offsetSymmetric(offset),
+            point.y + config.offsetSymmetric(offset),
+          )),
+      PointD(
+        points.last.x + config.offsetSymmetric(offset),
+        points.last.y + config.offsetSymmetric(offset),
+      )
+    ];
     return curve(result, config);
   }
 

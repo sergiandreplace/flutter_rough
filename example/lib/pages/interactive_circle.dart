@@ -41,9 +41,9 @@ class CirclePainter extends InteractivePainter {
 
   @override
   void paintRough(Canvas canvas, Size size) {
-    Generator generator = Generator(drawConfig, NoFiller(const FillerConfig().copyWith(drawConfig: drawConfig)));
+    Generator generator = Generator(drawConfig, NoFiller(FillerConfig.build().copyWith(drawConfig: drawConfig)));
     double s = min(size.width, size.height);
     Drawable figure = generator.circle(size.width / 2, size.height / 2, s * 0.8);
-    Rough().draw(canvas, figure, pathPaint, fillPaint);
+    canvas.drawRough(figure, pathPaint, fillPaint);
   }
 }

@@ -1,12 +1,13 @@
 import 'dart:math';
 
+// Describe how a particular shape is drawn.
 class DrawConfig {
-  final double maxRandomnessOffset; //line + solidFiller
-  final double roughness; //everything
-  final double bowing; //line
-  final double curveFitting; //ellipse
-  final double curveTightness; //curve
-  final double curveStepCount; //generateEllipseParams
+  final double maxRandomnessOffset;
+  final double roughness;
+  final double bowing;
+  final double curveFitting;
+  final double curveTightness;
+  final double curveStepCount;
   final int seed;
   final Randomizer randomizer;
 
@@ -31,6 +32,13 @@ class DrawConfig {
     this.randomizer,
   });
 
+  /// Generates a [DrawConfig]
+  /// * [roughness] Numerical value indicating how rough the drawing is. A rectangle with the roughness of 0 would be a perfect rectangle. Default value is 1. There is no upper limit to this value, but a value over 10 is mostly useless.
+  /// * [bowing] Numerical value indicating how curvy the lines are when drawing a sketch. A value of 0 will cause straight lines. Default value is 1.
+  /// * [seed] The seed for creating random values used in shape generation. This is useful for creating the exact shape when re-generating with the same parameters. Default value is 1.
+  /// * [curveStepCount] When drawing ellipses, circles, and arcs, Rough approximates [curveStepCount] number of points to estimate the shape. Default value is 9.
+  /// * [curveTightness]
+  /// * [curveFitting] When drawing ellipses, circles, and arcs, it means how close should the rendered dimensions be when compared to the specified one. Default value is 0.95.
   static DrawConfig build({
     double maxRandomnessOffset,
     double roughness,

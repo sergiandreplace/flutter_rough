@@ -24,38 +24,37 @@ To draw a figure you have to:
 2. Create a `Filler` to be used when drawing objects (you have to provide a configuration for the filling and a `DrawConfig` for the filling path).
 3. Create a `Generator` object using the created `DrawConfig` and `Filler`. This will define a drawing/filling style.
 4. Invoke the drawing method from the `Generator` to create a `Drawable`.
-5. Paint the `Drawable` in the canvas using the `Rough.draw` method.
+5. Paint the `Drawable` in the canvas using the `drawRough` method extension for `Canvas`.
 
-Here an example on how to draw a rectangle:
+Here an example on how to draw a circle:
 
 ```dart
-    //Create a `DrawConfig` object.
-    DrawConfig myDrawConfig = DrawConfig.build(
-      roughness: 3,
-      curveStepCount: 14,
-      maxRandomnessOffset: 3,
-    );
+//Create a `DrawConfig` object.
+DrawConfig myDrawConfig = DrawConfig.build(
+  roughness: 3,
+  curveStepCount: 14,
+  maxRandomnessOffset: 3,
+);
 
-    //Create a `Filler` (we reuse the drawConfig in this case).
-    Filler myFiller = ZigZagFiller(
-        FillerConfig(
-          hachureGap: 8,
-          hachureAngle: -20,
-          drawConfig: myDrawConfig,
-        ),
-    );
+//Create a `Filler` with a configuration (we reuse the drawConfig in this case).
+FillerConfig myFillerConfig = FillerConfig(
+    hachureGap: 8,
+    hachureAngle: -20,
+    drawConfig: myDrawConfig,
+);
+Filler myFiller = ZigZagFiller(myFillerConfig);
 
-    //3Create a `Generator` with the created `DrawConfig` and `Filler`
-    Generator generator = Generator(
-      myDrawConfig,
-      myFiller,
-    );
+//Create a `Generator` with the created `DrawConfig` and `Filler`
+Generator generator = Generator(
+  myDrawConfig,
+  myFiller,
+);
 
-    //4. Build a circle `Drawable`.
-    Drawable figure = generator.circle(200, 200, 320);
+//4. Build a circle `Drawable`.
+Drawable figure = generator.circle(200, 200, 320);
 
-    //5. Paint the `Drawable` in the canvas.
-    Rough().draw(canvas, figure, pathPaint, fillPaint);
+//5. Paint the `Drawable` in the canvas.
+Canvas.drawRough(figure, pathPaint, fillPaint);
 ```
 
 And this is the result:
