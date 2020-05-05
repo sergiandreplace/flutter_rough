@@ -1,5 +1,4 @@
 #!/bin/bash
-rm ~/.pub-cache/credentials.json 2> /dev/null
-mkdir ~/.pub-cache 2> /dev/null
-echo $CACHED_JSON > ~/.pub-cache/credentials.json
+rm $FLUTTER_ROOT/.pub-cache/credentials.json 2> /dev/null
+echo $CACHED_JSON > $FLUTTER_ROOT/.pub-cache/credentials.json
 
