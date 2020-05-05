@@ -16,7 +16,7 @@ dependencies:
 ```
 ## Basic usage
 
-Right now only drawing via canvas is supported. This is a basic documentation in case you want to play around with Rough. I can't ensure non-breaking changes of the librayr interface.
+Right now only drawing via canvas is supported. This is a basic documentation in case you want to play around with Rough. I can't ensure non-breaking changes of the library interface.
 
 To draw a figure you have to:
 
