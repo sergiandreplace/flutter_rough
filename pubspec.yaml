@@ -1,6 +1,6 @@
 name: rough
 description: Rough is a library that allows you draw in a sketchy, hand-drawn-like style
-version: 0.1.0+2
+version: 0.1.1
 homepage: https://github.com/sergiandreplace/flutter_rough
 repository: https://github.com/sergiandreplace/flutter_rough
 
