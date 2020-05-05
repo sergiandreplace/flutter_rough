@@ -56,6 +56,6 @@ Here an example on how to draw a rectangle:
 
 And this is the result:
 
-(https://raw.githubusercontent.com/sergiandreplace/flutter_rough/master/screenshots/circle.png)
+![Result](https://raw.githubusercontent.com/sergiandreplace/flutter_rough/master/screenshots/circle.png)
 
 Both `DrawConfig` and `FillerConfig` will use default values for anything not specfied.
