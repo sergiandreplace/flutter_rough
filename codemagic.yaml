@@ -17,6 +17,7 @@ workflows:
           source: true
     scripts:
       - flutter packages pub get
+      - flutter format .
       - chmod +x ./scripts/cache.sh
       - ./scripts/cache.sh
       - flutter pub publish --dry-run
