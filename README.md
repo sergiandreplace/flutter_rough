@@ -1,4 +1,7 @@
-![Pub Version](https://img.shields.io/pub/v/rough?label=latest%20version) ![GitHub Release Date](https://img.shields.io/github/release-date/sergiandreplace/flutter_rough)  [![Codemagic build status](https://api.codemagic.io/apps/5eb08350b412c5001ac53791/5eb08350b412c5001ac53790/status_badge.svg)](https://codemagic.io/apps/5eb08350b412c5001ac53791/5eb08350b412c5001ac53790/latest_build) ![GitHub](https://img.shields.io/github/license/sergiandreplace/flutter_rough)
+[![Pub](https://img.shields.io/pub/v/rough?label=latest%20version)](https://pub.dev/packages/rough)
+[![GitHub Release Date](https://img.shields.io/github/release-date/sergiandreplace/flutter_rough)](https://pub.dev/packages/rough)
+[![Codemagic build status](https://api.codemagic.io/apps/5eb08350b412c5001ac53791/5eb08350b412c5001ac53790/status_badge.svg)](https://codemagic.io/apps/5eb08350b412c5001ac53791/5eb08350b412c5001ac53790/latest_build) 
+[![GitHub](https://img.shields.io/github/license/sergiandreplace/flutter_rough)](https://github.com/sergiandreplace/flutter_rough/blob/master/LICENSE)
 
 # Rough
 
