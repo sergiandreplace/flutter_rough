@@ -1,0 +1,23 @@
+workflows:
+  my-workflow:
+    name: Release version
+    environment:
+      vars:
+        CACHED_JSON: Encrypted(Z0FBQUFBQmVzSnQ3SVlzbmVNWnVJM1BlLWZpdkFweHNnaXg5eEtfNktjMUVUcnE1V1k4ZHkzUi0wR0hvcW1COUxwQjFpSGZRVWFwWWpxVnhOU0VqRDFVV2RvRENkeUtBUndRMThTRXRCSkxJRHFmY0NGejZGMWpWRWtma1U5dlU3ZFhpa3FLX0hESTF3YTRVMW1QYUJiUDh0QkRNb2lONmZnLUJScUZSalVXbENVQXdkQ0FVLVFJNEpfdjRtSl9MbmZSdEV4R0E1TXptU29rekg3YzZnMUt6dFRBR2pWcDY3ajkyazA5UDR3RGxUc2hjZkNSdXZVcmRwZmczWHZiY0JGWS1acmNkcXF4a1g4cUpMdk15Z2ozNThvdGVXN1M4SEhxZHNCd1ZpRk5fWXYzbzRuc2plUjNMSU9sUTFwdDMwcmlVYkZuOWR3OE9lbzNsdTEzV1RJYWVRNWZsemFLN2M0RWFMR25wZW92NmJaOHpYMkVIRkJOTlVSYi1tVVd5OEdVNkdqWnh2WElsQ2FLcEdwSUdiSDdQVUlzNURud3dnbGtDMWJSN3J6N2hxN2xfTzRjLXZrbThveDFIQ19JVHpjV0pKYU82VnlEbEhTbFdVc2NNNGZCZGVlbzJweUxvM2s1anZzek5VbVRDNHlNSUJqX0V3SFFEdEdPMzIwNjdZWHhCb0d3WEhiV1hPX25hQ3hFZzVCbWg3cG83U20wUXdETWhZZnZaRUxBdEd4Y2s5LTBPYXo2RXhDX2NOdkJMS3JlS25WUndnYTZCc2N0SmlpNHB3MFEtTzlEMjlBR1llZTJuME5lcUMxa2dqcFBvOTVaN2FmekdMakRHaG1lZ3pMUGkzY1ZnOW5TdnhwSW92NzZWOGkzVGtiUUFUcjFMV2VMR0R3dElRbDc3RGh5UEpQZjBIeS1zM0pwNXlLUlJfQnc1ajlOdzRFcUI=)
+      flutter: stable
+    cache:
+      cache_paths:
+        - ~/.pub-cache
+    triggering:
+      events:
+        - tag
+      branch_patterns:
+        - pattern: 'test_codemagic'
+          include: true
+          source: true
+    scripts:
+      - flutter packages pub get
+      - chmod +x ./scripts/cache.sh
+      - ./scripts/cache.sh
+      - flutter pub publish --dry-run
+      - flutter pub publish -f
