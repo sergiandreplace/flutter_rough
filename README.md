@@ -62,4 +62,14 @@ And this is the result:
 
 ![Result](https://raw.githubusercontent.com/sergiandreplace/flutter_rough/master/screenshots/circle.png)
 
-Both `DrawConfig` and `FillerConfig` will use default values for anything not specfied.
+Both `DrawConfig` and `FillerConfig` will use default values for anything not specified.
+
+## Samples
+
+Some screenshots of the example app:
+
+
+![Example 1](https://raw.githubusercontent.com/sergiandreplace/flutter_rough/master/screenshots/example_app_1.png)
+![Example 2](https://raw.githubusercontent.com/sergiandreplace/flutter_rough/master/screenshots/example_app_2.png)
+![Example 3](https://raw.githubusercontent.com/sergiandreplace/flutter_rough/master/screenshots/example_app_3.png)
+![Example 4](https://raw.githubusercontent.com/sergiandreplace/flutter_rough/master/screenshots/example_app_4.png)
