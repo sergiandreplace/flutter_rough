@@ -7,8 +7,6 @@ class Op {
   final OpType op;
   final List<PointD> data;
 
-  Op._(this.op, this.data);
-
   Op.move(PointD point)
       : op = OpType.move,
         data = [point];
