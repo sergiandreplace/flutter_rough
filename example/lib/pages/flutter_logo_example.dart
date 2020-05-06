@@ -5,13 +5,13 @@ import 'package:rough/rough.dart';
 
 import '../interactive_canvas.dart';
 
-class FlutterLogoPage extends StatelessWidget {
+class FlutterLogoExamplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Interactive Flutter Logo')),
       body: InteractiveBody(
-        painterBuilder: (drawConfig) => FlutterLogoPainter(drawConfig),
+        example: FlutterLogoExample(),
         properties: <DiscreteProperty>[
           DiscreteProperty(name: 'seed', label: 'Seed', min: 0, max: 50, steps: 50),
           DiscreteProperty(name: 'roughness', label: 'Roughness', min: 0, max: 5, steps: 50),
@@ -23,7 +23,7 @@ class FlutterLogoPage extends StatelessWidget {
   }
 }
 
-class FlutterLogoPainter extends InteractivePainter {
+class FlutterLogoExample extends InteractiveExample {
   Paint stroke = Paint()
     ..strokeWidth = 2
     ..isAntiAlias = true
@@ -37,10 +37,8 @@ class FlutterLogoPainter extends InteractivePainter {
     ..color = Colors.lightBlueAccent
     ..style = PaintingStyle.stroke;
 
-  FlutterLogoPainter(DrawConfig drawConfig) : super(drawConfig);
-
   @override
-  void paintRough(canvas, size) {
+  void paintRough(canvas, size, drawConfig) {
     FillerConfig fillerConfig = FillerConfig.build(
       hachureAngle: 90,
       drawConfig: drawConfig,

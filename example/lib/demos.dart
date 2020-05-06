@@ -1,7 +1,7 @@
-import 'package:RoughExample/pages/flutter_logo.dart';
-import 'package:RoughExample/pages/interactive_arc.dart';
-import 'package:RoughExample/pages/interactive_circle.dart';
-import 'package:RoughExample/pages/interactive_rectangle.dart';
+import 'package:RoughExample/pages/arc_example.dart';
+import 'package:RoughExample/pages/circle_example.dart';
+import 'package:RoughExample/pages/flutter_logo_example.dart';
+import 'package:RoughExample/pages/rectangle_example.dart';
 import 'package:flutter/material.dart';
 
 class Demo {
@@ -17,13 +17,13 @@ final List<Demo> demos = [
   Demo(
     'Flutter logo',
     'A simple Flutter logo drawn using Rough',
-    (context) => FlutterLogoPage(),
+    (context) => FlutterLogoExamplePage(),
     const FlutterLogo(),
   ),
   Demo(
     'Interactive circle',
     'A circle drawn with Rough generated with interactive parameters',
-    (context) => InteractiveCirclePage(),
+    (context) => CircleExamplePage(),
     const Icon(
       Icons.add_circle,
       size: 36,
@@ -32,7 +32,7 @@ final List<Demo> demos = [
   Demo(
     'Interactive rectangle',
     'A rectange drawn with Rough generated with interactive parameters',
-    (context) => InteractiveRectanglePage(),
+    (context) => RectangleExamplePage(),
     const Icon(
       Icons.add_box,
       size: 36,
@@ -41,7 +41,7 @@ final List<Demo> demos = [
   Demo(
     'Interactive arc',
     'An arc drawn with Rough generated with interactive parameters',
-    (context) => InteractiveArcPage(),
+    (context) => ArcExamplePage(),
     const Icon(
       Icons.pie_chart_outlined,
       size: 36,

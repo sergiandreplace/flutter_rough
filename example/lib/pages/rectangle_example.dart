@@ -4,13 +4,13 @@ import 'package:rough/rough.dart';
 
 import '../interactive_canvas.dart';
 
-class InteractiveRectanglePage extends StatelessWidget {
+class RectangleExamplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Interactive rectangle demo')),
       body: InteractiveBody(
-        painterBuilder: (drawConfig) => Rectangle(drawConfig),
+        example: RectangleExample(),
         properties: <DiscreteProperty>[
           DiscreteProperty(name: 'seed', label: 'Seed', min: 0, max: 50, steps: 50),
           DiscreteProperty(name: 'roughness', label: 'Roughness', min: 0, max: 5, steps: 50),
@@ -22,7 +22,7 @@ class InteractiveRectanglePage extends StatelessWidget {
   }
 }
 
-class Rectangle extends InteractivePainter {
+class RectangleExample extends InteractiveExample {
   final Paint pathPaint = Paint()
     ..color = Colors.lightGreen.withOpacity(0.8)
     ..style = PaintingStyle.stroke
@@ -35,10 +35,8 @@ class Rectangle extends InteractivePainter {
     ..isAntiAlias = true
     ..strokeWidth = 1;
 
-  Rectangle(DrawConfig drawConfig) : super(drawConfig);
-
   @override
-  void paintRough(Canvas canvas, Size size) {
+  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig) {
     Generator generator = Generator(drawConfig, NoFiller(FillerConfig.build().copyWith(drawConfig: drawConfig)));
 
     Drawable figure = generator.rectangle(size.width * 0.1, size.height * 0.2, size.width * 0.8, size.height * 0.6);

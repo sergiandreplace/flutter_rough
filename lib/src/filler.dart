@@ -34,7 +34,7 @@ class FillerConfig {
     this.zigzagOffset,
   }) : _drawConfig = drawConfig;
 
-  /// * [fillWeigh] When using dots styles to fill the shape, this value represents the diameter of the dot.
+  /// * [fillWeight] When using dots styles to fill the shape, this value represents the diameter of the dot.
   /// * [hachureAngle] Numerical value (in degrees) that defines the angle of the hachure lines. Default value is -41 degrees.
   /// * [hachureGap] Numerical value that defines the average gap, in pixels, between two hachure lines. Default value is 15.
   /// * [dashOffset] When filling a shape using the [DashedFiller], this property indicates the nominal length of dash (in pixels). If not set, it defaults to the hachureGap value.

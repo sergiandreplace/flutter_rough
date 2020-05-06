@@ -87,6 +87,31 @@ class DrawConfig {
           curveStepCount: curveStepCount ?? this.curveStepCount,
           seed: seed ?? this.seed,
           randomizer: randomizer ?? (this.randomizer == null ? null : Randomizer(seed: this.randomizer.seed)));
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DrawConfig &&
+          runtimeType == other.runtimeType &&
+          maxRandomnessOffset == other.maxRandomnessOffset &&
+          roughness == other.roughness &&
+          bowing == other.bowing &&
+          curveFitting == other.curveFitting &&
+          curveTightness == other.curveTightness &&
+          curveStepCount == other.curveStepCount &&
+          seed == other.seed &&
+          randomizer == other.randomizer;
+
+  @override
+  int get hashCode =>
+      maxRandomnessOffset.hashCode ^
+      roughness.hashCode ^
+      bowing.hashCode ^
+      curveFitting.hashCode ^
+      curveTightness.hashCode ^
+      curveStepCount.hashCode ^
+      seed.hashCode ^
+      randomizer.hashCode;
 }
 
 class Randomizer {

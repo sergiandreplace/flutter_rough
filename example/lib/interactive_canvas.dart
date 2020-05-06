@@ -16,18 +16,18 @@ class DiscreteProperty {
 typedef PainterBuilder = InteractivePainter Function(DrawConfig);
 
 class InteractiveBody extends StatefulWidget {
-  final PainterBuilder painterBuilder;
+  final InteractiveExample example;
   final List<DiscreteProperty> properties;
 
-  const InteractiveBody({Key key, this.painterBuilder, this.properties}) : super(key: key);
+  const InteractiveBody({Key key, this.example, this.properties}) : super(key: key);
 
   @override
   _InteractiveBodyState createState() => _InteractiveBodyState();
 }
 
-class _InteractiveBodyState extends State<InteractiveBody> {
+class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderStateMixin {
   Map<String, double> propertyValues = HashMap<String, double>();
-  DrawConfig drawConfig;
+  TabController _tabController;
 
   @override
   void initState() {
@@ -39,6 +39,11 @@ class _InteractiveBodyState extends State<InteractiveBody> {
     propertyValues['curveTightness'] = DrawConfig.defaultValues.curveTightness;
     propertyValues['curveStepCount'] = DrawConfig.defaultValues.curveStepCount;
     propertyValues['seed'] = DrawConfig.defaultValues.seed.toDouble();
+    _tabController = TabController(
+      length: 3,
+      initialIndex: 0,
+      vsync: this,
+    );
   }
 
   void updateState({
@@ -52,14 +57,6 @@ class _InteractiveBodyState extends State<InteractiveBody> {
 
   @override
   Widget build(BuildContext context) {
-    DrawConfig drawConfig = DrawConfig.build(
-        maxRandomnessOffset: propertyValues['maxRandomnessOffset'],
-        bowing: propertyValues['bowing'],
-        roughness: propertyValues['roughness'],
-        curveFitting: propertyValues['curveFitting'],
-        curveTightness: propertyValues['curveTightness'],
-        curveStepCount: propertyValues['curveStepCount'],
-        seed: propertyValues['seed'].floor());
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -67,28 +64,75 @@ class _InteractiveBodyState extends State<InteractiveBody> {
         Expanded(
           child: Card(
             child: InteractiveCanvas(
-              painter: widget.painterBuilder(drawConfig),
+              example: widget.example,
+              propertyValues: propertyValues,
             ),
           ),
         ),
+        TabBar(
+          controller: _tabController,
+          tabs: <Widget>[
+            ConfigTab(label: 'Draw', iconData: Icons.border_color),
+            ConfigTab(label: 'Filler', iconData: Icons.format_color_fill),
+            ConfigTab(label: 'Shape', iconData: Icons.format_shapes),
+          ],
+          onTap: (index) => setState(() => _tabController.index = index),
+        ),
         Container(
           height: 200,
-          child: ListView(
-            children: widget.properties
-                .map(
-                  (property) => PropertySlider(
-                    label: property.label,
-                    value: propertyValues[property.name],
-                    min: property.min,
-                    max: property.max,
-                    steps: property.steps,
-                    onChange: (value) => updateState(property: property.name, value: value),
-                  ),
-                )
-                .toList(),
+          child: IndexedStack(
+            sizing: StackFit.expand,
+            index: _tabController.index,
+            children: <Widget>[
+              ListView(
+                children: widget.properties
+                    .map(
+                      (property) => PropertySlider(
+                        label: property.label,
+                        value: propertyValues[property.name],
+                        min: property.min,
+                        max: property.max,
+                        steps: property.steps,
+                        onChange: (value) => updateState(property: property.name, value: value),
+                      ),
+                    )
+                    .toList(),
+              ),
+              Container(
+                child: const Center(
+                  child: Text('ehllo'),
+                ),
+              ),
+              Container(
+                child: const Center(
+                  child: Text('ehllo'),
+                ),
+              ),
+            ],
           ),
         )
       ],
+    );
+  }
+}
+
+class ConfigTab extends StatelessWidget {
+  final String label;
+  final IconData iconData;
+
+  const ConfigTab({Key key, this.label, this.iconData}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Tab(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(iconData, size: 16),
+          const SizedBox(width: 8),
+          Text(label),
+        ],
+      ),
     );
   }
 }
@@ -141,7 +185,7 @@ class _PropertySliderState extends State<PropertySlider> {
             max: widget.max,
             onChanged: onConfigValueChange,
           ),
-        )
+        ),
       ],
     );
   }
@@ -149,37 +193,60 @@ class _PropertySliderState extends State<PropertySlider> {
 
 typedef OnConfigChange = void Function(double);
 
-class InteractiveCanvas extends StatelessWidget {
-  final InteractivePainter painter;
+class InteractiveCanvas extends StatefulWidget {
+  final InteractiveExample example;
+  final Map<String, double> propertyValues;
 
   const InteractiveCanvas({
     Key key,
-    this.painter,
+    this.example,
+    this.propertyValues,
   }) : super(key: key);
 
   @override
+  _InteractiveCanvasState createState() => _InteractiveCanvasState();
+}
+
+class _InteractiveCanvasState extends State<InteractiveCanvas> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    DrawConfig drawConfig = DrawConfig.build(
+        maxRandomnessOffset: widget.propertyValues['maxRandomnessOffset'],
+        bowing: widget.propertyValues['bowing'],
+        roughness: widget.propertyValues['roughness'],
+        curveFitting: widget.propertyValues['curveFitting'],
+        curveTightness: widget.propertyValues['curveTightness'],
+        curveStepCount: widget.propertyValues['curveStepCount'],
+        seed: widget.propertyValues['seed'].floor());
     return CustomPaint(
       size: Size.square(double.infinity),
-      painter: painter,
+      painter: InteractivePainter(drawConfig, widget.example),
     );
   }
 }
 
-abstract class InteractivePainter extends CustomPainter {
+class InteractivePainter extends CustomPainter {
   final DrawConfig drawConfig;
+  final InteractiveExample interactiveExample;
 
-  InteractivePainter(this.drawConfig);
+  InteractivePainter(this.drawConfig, this.interactiveExample);
 
   @override
   paint(Canvas canvas, Size size) {
-    paintRough(canvas, size);
+    interactiveExample.paintRough(canvas, size, drawConfig);
   }
-
-  void paintRough(Canvas canvas, Size size);
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(InteractivePainter oldDelegate) {
+    return oldDelegate.drawConfig != drawConfig;
   }
+}
+
+abstract class InteractiveExample {
+  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig);
 }

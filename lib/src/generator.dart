@@ -5,7 +5,7 @@ import 'filler.dart';
 import 'geometry.dart';
 import 'renderer.dart';
 
-/// [Generator] is class that lets you create a [Drawable] object for a shape that can be later used with the [drawRough] method.
+/// [Generator] is class that lets you create a [Drawable] object for a shape.
 class Generator {
   final DrawConfig drawConfig;
   final Filler filler;

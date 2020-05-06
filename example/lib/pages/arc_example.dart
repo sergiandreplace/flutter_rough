@@ -6,13 +6,13 @@ import 'package:rough/rough.dart';
 
 import '../interactive_canvas.dart';
 
-class InteractiveArcPage extends StatelessWidget {
+class ArcExamplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Interactive circle demo')),
+      appBar: AppBar(title: const Text('Interactive arc demo')),
       body: InteractiveBody(
-        painterBuilder: (drawConfig) => ArcPainter(drawConfig),
+        example: ArcExample(),
         properties: <DiscreteProperty>[
           DiscreteProperty(name: 'seed', label: 'Seed', min: 0, max: 50, steps: 50),
           DiscreteProperty(name: 'roughness', label: 'Rougness', min: 0, max: 2, steps: 50),
@@ -25,7 +25,7 @@ class InteractiveArcPage extends StatelessWidget {
   }
 }
 
-class ArcPainter extends InteractivePainter {
+class ArcExample extends InteractiveExample {
   final Paint pathPaint = Paint()
     ..color = Colors.red
     ..style = PaintingStyle.stroke
@@ -37,10 +37,8 @@ class ArcPainter extends InteractivePainter {
     ..isAntiAlias = true
     ..strokeWidth = 1;
 
-  ArcPainter(DrawConfig drawConfig) : super(drawConfig);
-
   @override
-  void paintRough(Canvas canvas, Size size) {
+  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig) {
     Generator generator = Generator(drawConfig, HachureFiller(FillerConfig.build().copyWith(drawConfig: drawConfig)));
     double s = min(size.width, size.height);
     Drawable figure = generator.arc(size.width / 2, size.height / 2, s * 0.8, s * 0.8, pi * 0.2, pi * 1.8, true);
