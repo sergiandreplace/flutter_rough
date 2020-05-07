@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rough/rough.dart';
 
@@ -45,11 +46,27 @@ Map<String, Filler Function(FillerConfig)> _fillers = <String, Filler Function(F
 
 typedef PainterBuilder = InteractivePainter Function(DrawConfig);
 
+class InteractiveExamplePage extends StatelessWidget {
+  final String title;
+  final InteractiveExample example;
+
+  const InteractiveExamplePage({Key key, this.title, this.example}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: InteractiveBody(
+        example: example,
+      ),
+    );
+  }
+}
+
 class InteractiveBody extends StatefulWidget {
   final InteractiveExample example;
-  final List<DiscreteProperty> properties;
 
-  const InteractiveBody({Key key, this.example, this.properties}) : super(key: key);
+  const InteractiveBody({Key key, this.example}) : super(key: key);
 
   @override
   _InteractiveBodyState createState() => _InteractiveBodyState();

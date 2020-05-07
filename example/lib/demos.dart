@@ -1,7 +1,4 @@
-import 'package:RoughExample/pages/arc_example.dart';
-import 'package:RoughExample/pages/circle_example.dart';
-import 'package:RoughExample/pages/flutter_logo_example.dart';
-import 'package:RoughExample/pages/rectangle_example.dart';
+import 'package:RoughExample/pages/example_pages.dart';
 import 'package:flutter/material.dart';
 
 class Demo {
