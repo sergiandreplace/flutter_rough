@@ -329,7 +329,7 @@ class InteractiveCanvas extends StatelessWidget {
     );
     Filler filler = _fillers[fillerType].call(fillerConfig);
     return CustomPaint(
-      size: Size.square(double.infinity),
+      size: const Size.square(double.infinity),
       painter: InteractivePainter(drawConfig, filler, example),
     );
   }

@@ -1,47 +1,56 @@
-import 'package:RoughExample/pages/example_pages.dart';
+import 'package:RoughExample/interactive_canvas.dart';
 import 'package:flutter/material.dart';
 
-class Demo {
+import 'interactive_examples.dart';
+import 'pages/example.dart';
+
+abstract class Demo {
   final String name;
   final String description;
-  final WidgetBuilder launcher;
   final Widget icon;
 
-  Demo(this.name, this.description, this.launcher, this.icon);
+  Demo(this.name, this.description, this.icon);
+
+  Widget buildPage();
 }
 
+class InteractiveDemo extends Demo {
+  final ExampleBuilder exampleBuilder;
+
+  InteractiveDemo(String name, String description, this.exampleBuilder, Widget icon) : super(name, description, icon);
+
+  @override
+  Widget buildPage() {
+    return ExamplePage(title: name, exampleBuilder: exampleBuilder);
+  }
+}
+
+typedef ExampleBuilder = InteractiveExample Function();
+
 final List<Demo> demos = [
-  Demo(
-    'Flutter logo',
-    'A simple Flutter logo drawn using Rough',
-    (context) => FlutterLogoExamplePage(),
-    const FlutterLogo(),
-  ),
-  Demo(
+  InteractiveDemo('Flutter logo', 'A simple Flutter logo drawn using Rough', () => FlutterLogoExample(), const FlutterLogo()),
+  InteractiveDemo(
     'Interactive circle',
     'A circle drawn with Rough generated with interactive parameters',
-    (context) => CircleExamplePage(),
-    const Icon(
-      Icons.add_circle,
-      size: 36,
-    ),
+    () => CircleExample(),
+    const Icon(Icons.add_circle, size: 36),
   ),
-  Demo(
+  InteractiveDemo(
     'Interactive rectangle',
     'A rectange drawn with Rough generated with interactive parameters',
-    (context) => RectangleExamplePage(),
-    const Icon(
-      Icons.add_box,
-      size: 36,
-    ),
+    () => RectangleExample(),
+    const Icon(Icons.add_box, size: 36),
   ),
-  Demo(
+  InteractiveDemo(
     'Interactive arc',
     'An arc drawn with Rough generated with interactive parameters',
-    (context) => ArcExamplePage(),
-    const Icon(
-      Icons.pie_chart_outlined,
-      size: 36,
-    ),
+    () => ArcExample(),
+    const Icon(Icons.pie_chart_outlined, size: 36),
+  ),
+  InteractiveDemo(
+    'Interactive curve',
+    'An curve drawn with Rough generated with interactive parameters',
+    () => CurveExample(),
+    const Icon(Icons.gesture, size: 36),
   ),
 ];

@@ -52,7 +52,12 @@ class DemoRow extends StatelessWidget {
           width: 42,
           height: 42,
         ),
-        onTap: () => Navigator.push<MaterialPageRoute>(context, MaterialPageRoute(builder: demo.launcher)),
+        onTap: () => Navigator.push<MaterialPageRoute>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => demo.buildPage(),
+          ),
+        ),
       ),
     );
   }
