@@ -38,15 +38,8 @@ class FlutterLogoExample extends InteractiveExample {
     ..style = PaintingStyle.stroke;
 
   @override
-  void paintRough(canvas, size, drawConfig) {
-    FillerConfig fillerConfig = FillerConfig.build(
-      hachureAngle: 90,
-      drawConfig: drawConfig,
-      fillWeight: 10,
-      hachureGap: 5,
-    );
-
-    Generator gen = Generator(drawConfig, HachureFiller(fillerConfig));
+  void paintRough(canvas, size, drawConfig, Filler filler) {
+    Generator gen = Generator(drawConfig, filler);
     double logoWidth = 165;
     double logoHeight = 201;
     double widthScale = (size.width) / (logoWidth);

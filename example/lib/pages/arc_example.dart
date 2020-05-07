@@ -38,8 +38,8 @@ class ArcExample extends InteractiveExample {
     ..strokeWidth = 1;
 
   @override
-  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig) {
-    Generator generator = Generator(drawConfig, HachureFiller(FillerConfig.build().copyWith(drawConfig: drawConfig)));
+  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig, Filler filler) {
+    Generator generator = Generator(drawConfig, filler);
     double s = min(size.width, size.height);
     Drawable figure = generator.arc(size.width / 2, size.height / 2, s * 0.8, s * 0.8, pi * 0.2, pi * 1.8, true);
     canvas.drawRough(figure, pathPaint, fillPaint);

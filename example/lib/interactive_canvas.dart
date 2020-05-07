@@ -9,9 +9,39 @@ class DiscreteProperty {
   final double max;
   final double min;
   final int steps;
+  final double value;
 
-  DiscreteProperty({this.name, this.label, this.min, this.max, this.steps});
+  DiscreteProperty({this.name, this.label, this.min, this.max, this.steps, this.value});
+
+  static List<DiscreteProperty> drawConfigProperties = [
+    DiscreteProperty(name: 'seed', label: 'Seed', min: 0, max: 50, steps: 50),
+    DiscreteProperty(name: 'roughness', label: 'Rougness', min: 0, max: 5, steps: 50),
+    DiscreteProperty(name: 'curveFitting', label: 'curveFitting', min: 0, max: 5, steps: 50),
+    DiscreteProperty(name: 'curveTightness', label: 'curveTightness', min: 0, max: 1, steps: 100),
+    DiscreteProperty(name: 'curveStepCount', label: 'curveStepCount', min: 1, max: 20, steps: 190),
+    DiscreteProperty(name: 'bowing', label: 'Bowing', min: 0, max: 20, steps: 400),
+    DiscreteProperty(name: 'maxRandomnessOffset', label: 'maxRandomnessOffset', min: 0, max: 20, steps: 50),
+  ];
+
+  static List<DiscreteProperty> fillerConfigProperties = [
+    DiscreteProperty(name: 'fillWeight', label: 'fillWeight', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'hachureAngle', label: 'hachureAngle', min: 0, max: 360, steps: 360),
+    DiscreteProperty(name: 'hachureGap', label: 'hachureGap', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'dashOffset', label: 'dashOffset', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'dashGap', label: 'dashGap', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'zigzagOffset', label: 'zigzagOffset', min: 0, max: 50, steps: 500),
+  ];
 }
+
+Map<String, Filler Function(FillerConfig)> _fillers = <String, Filler Function(FillerConfig)>{
+  'NoFiller': (fillerConfig) => NoFiller(fillerConfig),
+  'HachureFiller': (fillerConfig) => HachureFiller(fillerConfig),
+  'ZigZagFiller': (fillerConfig) => ZigZagFiller(fillerConfig),
+  'HatchFiller': (fillerConfig) => HatchFiller(fillerConfig),
+  'DotFiller': (fillerConfig) => DotFiller(fillerConfig),
+  'DashedFiller': (fillerConfig) => DashedFiller(fillerConfig),
+  'SolidFiller': (fillerConfig) => SolidFiller(fillerConfig),
+};
 
 typedef PainterBuilder = InteractivePainter Function(DrawConfig);
 
@@ -26,19 +56,28 @@ class InteractiveBody extends StatefulWidget {
 }
 
 class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderStateMixin {
-  Map<String, double> propertyValues = HashMap<String, double>();
+  Map<String, double> drawConfigValues = HashMap<String, double>();
+  Map<String, double> fillerConfigValues = HashMap<String, double>();
+  String fillerType;
   TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    propertyValues['maxRandomnessOffset'] = DrawConfig.defaultValues.roughness;
-    propertyValues['bowing'] = DrawConfig.defaultValues.roughness;
-    propertyValues['roughness'] = DrawConfig.defaultValues.roughness;
-    propertyValues['curveFitting'] = DrawConfig.defaultValues.curveFitting;
-    propertyValues['curveTightness'] = DrawConfig.defaultValues.curveTightness;
-    propertyValues['curveStepCount'] = DrawConfig.defaultValues.curveStepCount;
-    propertyValues['seed'] = DrawConfig.defaultValues.seed.toDouble();
+    drawConfigValues['maxRandomnessOffset'] = DrawConfig.defaultValues.roughness;
+    drawConfigValues['bowing'] = DrawConfig.defaultValues.roughness;
+    drawConfigValues['roughness'] = DrawConfig.defaultValues.roughness;
+    drawConfigValues['curveFitting'] = DrawConfig.defaultValues.curveFitting;
+    drawConfigValues['curveTightness'] = DrawConfig.defaultValues.curveTightness;
+    drawConfigValues['curveStepCount'] = DrawConfig.defaultValues.curveStepCount;
+    drawConfigValues['seed'] = DrawConfig.defaultValues.seed.toDouble();
+    fillerConfigValues['fillWeight'] = FillerConfig.defaultConfig.fillWeight;
+    fillerConfigValues['hachureAngle'] = FillerConfig.defaultConfig.hachureAngle;
+    fillerConfigValues['hachureGap'] = FillerConfig.defaultConfig.hachureGap;
+    fillerConfigValues['dashOffset'] = FillerConfig.defaultConfig.dashOffset;
+    fillerConfigValues['dashGap'] = FillerConfig.defaultConfig.dashGap;
+    fillerConfigValues['zigzagOffset'] = FillerConfig.defaultConfig.zigzagOffset;
+    fillerType = _fillers.keys.elementAt(0);
     _tabController = TabController(
       length: 3,
       initialIndex: 0,
@@ -46,12 +85,27 @@ class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderSt
     );
   }
 
-  void updateState({
+  void updateDrawingConfig({
     String property,
     double value,
   }) {
     setState(() {
-      propertyValues[property] = value;
+      drawConfigValues[property] = value;
+    });
+  }
+
+  void updateFillerConfig({
+    String property,
+    double value,
+  }) {
+    setState(() {
+      fillerConfigValues[property] = value;
+    });
+  }
+
+  void updateFillerType({String value}) {
+    setState(() {
+      fillerType = value;
     });
   }
 
@@ -65,7 +119,9 @@ class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderSt
           child: Card(
             child: InteractiveCanvas(
               example: widget.example,
-              propertyValues: propertyValues,
+              drawConfigValues: drawConfigValues,
+              fillerConfigValues: fillerConfigValues,
+              fillerType: fillerType,
             ),
           ),
         ),
@@ -85,23 +141,51 @@ class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderSt
             index: _tabController.index,
             children: <Widget>[
               ListView(
-                children: widget.properties
+                children: DiscreteProperty.drawConfigProperties
                     .map(
                       (property) => PropertySlider(
                         label: property.label,
-                        value: propertyValues[property.name],
+                        value: drawConfigValues[property.name],
                         min: property.min,
                         max: property.max,
                         steps: property.steps,
-                        onChange: (value) => updateState(property: property.name, value: value),
+                        onChange: (value) => updateDrawingConfig(property: property.name, value: value),
                       ),
                     )
                     .toList(),
               ),
-              Container(
-                child: const Center(
-                  child: Text('ehllo'),
-                ),
+              ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: DropdownButton<String>(
+                      value: fillerType,
+                      isExpanded: false,
+                      onChanged: (value) {
+                        updateFillerType(value: value);
+                      },
+                      underline: Container(),
+                      items: _fillers.keys
+                          .map((fillerKey) => DropdownMenuItem<String>(
+                                value: fillerKey,
+                                child: Text(fillerKey),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                  ...DiscreteProperty.fillerConfigProperties
+                      .map(
+                        (property) => PropertySlider(
+                          label: property.label,
+                          value: fillerConfigValues[property.name],
+                          min: property.min,
+                          max: property.max,
+                          steps: property.steps,
+                          onChange: (value) => updateFillerConfig(property: property.name, value: value),
+                        ),
+                      )
+                      .toList()
+                ],
               ),
               Container(
                 child: const Center(
@@ -193,52 +277,58 @@ class _PropertySliderState extends State<PropertySlider> {
 
 typedef OnConfigChange = void Function(double);
 
-class InteractiveCanvas extends StatefulWidget {
+class InteractiveCanvas extends StatelessWidget {
   final InteractiveExample example;
-  final Map<String, double> propertyValues;
+  final Map<String, double> drawConfigValues;
+  final Map<String, double> fillerConfigValues;
+  final String fillerType;
 
   const InteractiveCanvas({
     Key key,
     this.example,
-    this.propertyValues,
+    this.drawConfigValues,
+    this.fillerConfigValues,
+    this.fillerType,
   }) : super(key: key);
-
-  @override
-  _InteractiveCanvasState createState() => _InteractiveCanvasState();
-}
-
-class _InteractiveCanvasState extends State<InteractiveCanvas> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     DrawConfig drawConfig = DrawConfig.build(
-        maxRandomnessOffset: widget.propertyValues['maxRandomnessOffset'],
-        bowing: widget.propertyValues['bowing'],
-        roughness: widget.propertyValues['roughness'],
-        curveFitting: widget.propertyValues['curveFitting'],
-        curveTightness: widget.propertyValues['curveTightness'],
-        curveStepCount: widget.propertyValues['curveStepCount'],
-        seed: widget.propertyValues['seed'].floor());
+        maxRandomnessOffset: drawConfigValues['maxRandomnessOffset'],
+        bowing: drawConfigValues['bowing'],
+        roughness: drawConfigValues['roughness'],
+        curveFitting: drawConfigValues['curveFitting'],
+        curveTightness: drawConfigValues['curveTightness'],
+        curveStepCount: drawConfigValues['curveStepCount'],
+        seed: drawConfigValues['seed'].floor());
+    FillerConfig fillerConfig = FillerConfig.build(
+      fillWeight: fillerConfigValues['fillWeight'],
+      hachureAngle: fillerConfigValues['hachureAngle'],
+      hachureGap: fillerConfigValues['hachureGap'],
+      dashOffset: fillerConfigValues['dashOffset'],
+      dashGap: fillerConfigValues['dashGap'],
+      zigzagOffset: fillerConfigValues['zigzagOffset'],
+      drawConfig: drawConfig,
+    );
+    Filler filler = _fillers[fillerType].call(fillerConfig);
     return CustomPaint(
       size: Size.square(double.infinity),
-      painter: InteractivePainter(drawConfig, widget.example),
+      painter: InteractivePainter(drawConfig, filler, example),
     );
   }
 }
 
 class InteractivePainter extends CustomPainter {
   final DrawConfig drawConfig;
+  final Filler filler;
   final InteractiveExample interactiveExample;
 
-  InteractivePainter(this.drawConfig, this.interactiveExample);
+  InteractivePainter(this.drawConfig, this.filler, this.interactiveExample);
 
   @override
   paint(Canvas canvas, Size size) {
-    interactiveExample.paintRough(canvas, size, drawConfig);
+    drawConfig.randomizer.reset();
+    interactiveExample.paintRough(canvas, size, drawConfig, filler);
   }
 
   @override
@@ -248,5 +338,5 @@ class InteractivePainter extends CustomPainter {
 }
 
 abstract class InteractiveExample {
-  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig);
+  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig, Filler filler);
 }

@@ -38,8 +38,8 @@ class CircleExample extends InteractiveExample {
     ..strokeWidth = 1;
 
   @override
-  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig) {
-    Generator generator = Generator(drawConfig, NoFiller(FillerConfig.build().copyWith(drawConfig: drawConfig)));
+  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig, Filler filler) {
+    Generator generator = Generator(drawConfig, filler);
     double s = min(size.width, size.height);
     Drawable figure = generator.circle(size.width / 2, size.height / 2, s * 0.8);
     canvas.drawRough(figure, pathPaint, fillPaint);

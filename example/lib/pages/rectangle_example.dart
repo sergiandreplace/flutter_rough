@@ -36,8 +36,8 @@ class RectangleExample extends InteractiveExample {
     ..strokeWidth = 1;
 
   @override
-  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig) {
-    Generator generator = Generator(drawConfig, NoFiller(FillerConfig.build().copyWith(drawConfig: drawConfig)));
+  void paintRough(Canvas canvas, Size size, DrawConfig drawConfig, Filler filler) {
+    Generator generator = Generator(drawConfig, filler);
 
     Drawable figure = generator.rectangle(size.width * 0.1, size.height * 0.2, size.width * 0.8, size.height * 0.6);
     canvas.drawRough(figure, pathPaint, fillPaint);

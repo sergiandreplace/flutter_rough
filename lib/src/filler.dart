@@ -43,7 +43,7 @@ class FillerConfig {
   static FillerConfig build({
     DrawConfig drawConfig,
     double fillWeight = 1,
-    double hachureAngle = -41,
+    double hachureAngle = 320,
     double hachureGap = 15,
     double dashOffset = 15,
     double dashGap = 2,

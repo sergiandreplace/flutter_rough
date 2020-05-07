@@ -126,6 +126,10 @@ class Randomizer {
   int get seed => _seed;
 
   double next() => _random.nextDouble();
+
+  void reset() {
+    _random = Random(_seed);
+  }
 }
 
 class Randomizer2 {
