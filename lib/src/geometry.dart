@@ -12,9 +12,9 @@ List<PointD> rotatePoints(List<PointD> points, PointD center, double degrees) {
 }
 
 PointD rotatePoint(PointD point, PointD center, double degrees) {
-  double angle = (pi / 180) * degrees;
-  double angleCos = cos(angle);
-  double angleSin = sin(angle);
+  final double angle = (pi / 180) * degrees;
+  final double angleCos = cos(angle);
+  final double angleSin = sin(angle);
 
   return PointD(
     ((point.x - center.x) * angleCos) - ((point.y - center.y) * angleSin) + center.x,
@@ -28,7 +28,7 @@ List<Line> rotateLines(List<Line> lines, PointD center, double degrees) =>
 enum PointsOrientation { collinear, clockwise, counterclockwise }
 
 PointsOrientation getOrientation(PointD p, PointD q, PointD r) {
-  double val = (q.x - p.x) * (r.y - q.y) - (q.y - p.y) * (r.x - q.x);
+  final double val = (q.x - p.x) * (r.y - q.y) - (q.y - p.y) * (r.x - q.x);
   if (val == 0) {
     return PointsOrientation.collinear;
   }
@@ -53,10 +53,10 @@ class EllipseParams {
 }
 
 class EllipseResult {
-  OpSet opset;
+  OpSet opSet;
   List<PointD> estimatedPoints;
 
-  EllipseResult({this.opset, this.estimatedPoints});
+  EllipseResult({this.opSet, this.estimatedPoints});
 }
 
 class Edge {

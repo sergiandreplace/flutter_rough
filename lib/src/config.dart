@@ -131,21 +131,3 @@ class Randomizer {
     _random = Random(_seed);
   }
 }
-
-class Randomizer2 {
-  int _seed;
-
-  Randomizer2({int seed = 0}) {
-    _seed = seed;
-  }
-
-  int get seed => _seed;
-
-  double next() {
-    _seed = 48272 * _seed;
-    double result = (powInt(2, 31) - 1 & (48271 * _seed)) / pow(2, 31);
-    return result;
-  }
-
-  int powInt(num x, num exponent) => pow(x, exponent).floor();
-}

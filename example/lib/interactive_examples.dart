@@ -121,8 +121,6 @@ class CurveExample extends InteractiveExample {
   @override
   void paintRough(Canvas canvas, Size size, DrawConfig drawConfig, Filler filler) {
     List<PointD> points = [];
-    Random r = Random(drawConfig.seed);
-    points.add(PointD(size.width / 2, size.height / 2));
     for (double i = 0; i <= pi * 6; i += pi / drawConfig.curveStepCount) {
       points
         ..add(PointD(
@@ -130,7 +128,6 @@ class CurveExample extends InteractiveExample {
           size.height / 2 + cos(i) * 7 * i + drawConfig.offsetSymmetric(drawConfig.maxRandomnessOffset),
         ));
     }
-
     canvas.drawRough(Generator(drawConfig, filler).curvePath(points), pathPaint, fillPaint);
   }
 }

@@ -38,16 +38,17 @@ class Line {
 
   double get length => sqrt(pow(source.x - target.x, 2) + pow(source.y - target.y, 2));
 
-  bool onSegment(PointD point) => (point.x <= max(source.x, target.x) &&
+  bool onSegment(PointD point) =>
+      point.x <= max(source.x, target.x) &&
       point.x >= min(source.x, target.x) &&
       point.y <= max(source.y, target.y) &&
-      point.y >= min(source.y, target.y));
+      point.y >= min(source.y, target.y);
 
   bool intersects(Line line) {
-    PointsOrientation o1 = getOrientation(source, target, line.source);
-    PointsOrientation o2 = getOrientation(source, target, line.target);
-    PointsOrientation o3 = getOrientation(line.source, line.target, source);
-    PointsOrientation o4 = getOrientation(line.source, line.target, target);
+    final PointsOrientation o1 = getOrientation(source, target, line.source);
+    final PointsOrientation o2 = getOrientation(source, target, line.target);
+    final PointsOrientation o3 = getOrientation(line.source, line.target, source);
+    final PointsOrientation o4 = getOrientation(line.source, line.target, target);
 
     if (o1 != o2 && o3 != o4) {
       return true;
@@ -76,13 +77,13 @@ class Line {
   }
 
   PointD intersectionWith(Line line) {
-    double yDiff = target.y - source.y;
-    double xDiff = source.x - target.x;
-    double diff = yDiff * (source.x) + xDiff * (source.y);
-    double lineYDiff = line.target.y - line.source.y;
-    double lineXDiff = line.source.x - line.target.x;
-    double lineDiff = lineYDiff * (line.source.x) + lineXDiff * (line.source.y);
-    double determinant = yDiff * lineXDiff - lineYDiff * xDiff;
+    final double yDiff = target.y - source.y;
+    final double xDiff = source.x - target.x;
+    final double diff = yDiff * (source.x) + xDiff * (source.y);
+    final double lineYDiff = line.target.y - line.source.y;
+    final double lineXDiff = line.source.x - line.target.x;
+    final double lineDiff = lineYDiff * (line.source.x) + lineXDiff * (line.source.y);
+    final double determinant = yDiff * lineXDiff - lineYDiff * xDiff;
     return determinant == 0
         ? PointD((lineXDiff * diff - xDiff * lineDiff) / determinant, (yDiff * lineDiff - lineYDiff * diff) / determinant)
         : null;

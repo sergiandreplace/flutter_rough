@@ -30,21 +30,21 @@ class Generator {
 
   ///Draws a rectangle with the top-left corner at ([x], [y]) with the specified [width] and [height].
   Drawable rectangle(double x, double y, double width, double height) {
-    List<PointD> points = [PointD(x, y), PointD(x + width, y), PointD(x + width, y + height), PointD(x, y + height)];
-    OpSet outline = OpSetBuilder.buildPolygon(points, drawConfig);
+    final List<PointD> points = [PointD(x, y), PointD(x + width, y), PointD(x + width, y + height), PointD(x, y + height)];
+    final OpSet outline = OpSetBuilder.buildPolygon(points, drawConfig);
     return _buildDrawable(outline, points);
   }
 
   ///Draws a rectangle with the center at ([x], [y]) with the specified [width] and [height].
   Drawable ellipse(double x, double y, double width, double height) {
-    EllipseParams ellipseParams = generateEllipseParams(width, height, drawConfig);
-    EllipseResult ellipseResponse = ellipseWithParams(x, y, drawConfig, ellipseParams);
-    return _buildDrawable(ellipseResponse.opset, ellipseResponse.estimatedPoints);
+    final EllipseParams ellipseParams = generateEllipseParams(width, height, drawConfig);
+    final EllipseResult ellipseResponse = ellipseWithParams(x, y, drawConfig, ellipseParams);
+    return _buildDrawable(ellipseResponse.opSet, ellipseResponse.estimatedPoints);
   }
 
   ///Draws a rectangle with the center at ([x], [y]) with the specified [diameter].
   Drawable circle(double x, double y, double diameter) {
-    Drawable ret = ellipse(x, y, diameter, diameter);
+    final Drawable ret = ellipse(x, y, diameter, diameter);
     return ret;
   }
 
@@ -59,7 +59,7 @@ class Generator {
   ///
   /// * [points] is an array of [PointD]
   Drawable polygon(List<PointD> points) {
-    var path = OpSetBuilder.linearPath(points, true, drawConfig);
+    final OpSet path = OpSetBuilder.linearPath(points, true, drawConfig);
     return _buildDrawable(path, points);
   }
 
@@ -70,8 +70,8 @@ class Generator {
   /// * [start], [stop] are the start and stop angles for the arc.
   /// * [closed] is a boolean argument. If true, lines are drawn to connect the two end points of the arc to the center.
   Drawable arc(double x, double y, double width, double height, double start, double stop, [bool closed = false]) {
-    OpSet outline = OpSetBuilder.arc(PointD(x, y), width, height, start, stop, closed, true, drawConfig);
-    List<PointD> fillPoints = OpSetBuilder.arcPolygon(PointD(x, y), width, height, start, stop, drawConfig);
+    final OpSet outline = OpSetBuilder.arc(PointD(x, y), width, height, start, stop, closed, true, drawConfig);
+    final List<PointD> fillPoints = OpSetBuilder.arcPolygon(PointD(x, y), width, height, start, stop, drawConfig);
     return _buildDrawable(outline, fillPoints);
   }
 

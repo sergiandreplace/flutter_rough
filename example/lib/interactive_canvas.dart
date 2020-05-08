@@ -6,31 +6,30 @@ import 'package:rough/rough.dart';
 
 class DiscreteProperty {
   final String name;
-  final String label;
   final double max;
   final double min;
   final int steps;
   final double value;
 
-  DiscreteProperty({this.name, this.label, this.min, this.max, this.steps, this.value});
+  DiscreteProperty({this.name, this.min, this.max, this.steps, this.value});
 
   static List<DiscreteProperty> drawConfigProperties = [
-    DiscreteProperty(name: 'seed', label: 'Seed', min: 0, max: 50, steps: 50),
-    DiscreteProperty(name: 'roughness', label: 'Rougness', min: 0, max: 5, steps: 50),
-    DiscreteProperty(name: 'curveFitting', label: 'curveFitting', min: 0, max: 5, steps: 50),
-    DiscreteProperty(name: 'curveTightness', label: 'curveTightness', min: 0, max: 1, steps: 100),
-    DiscreteProperty(name: 'curveStepCount', label: 'curveStepCount', min: 1, max: 20, steps: 190),
-    DiscreteProperty(name: 'bowing', label: 'Bowing', min: 0, max: 20, steps: 400),
-    DiscreteProperty(name: 'maxRandomnessOffset', label: 'maxRandomnessOffset', min: 0, max: 20, steps: 50),
+    DiscreteProperty(name: 'seed', min: 0, max: 50, steps: 50),
+    DiscreteProperty(name: 'roughness', min: 0, max: 5, steps: 50),
+    DiscreteProperty(name: 'curveFitting', min: 0, max: 5, steps: 50),
+    DiscreteProperty(name: 'curveTightness', min: 0, max: 1, steps: 100),
+    DiscreteProperty(name: 'curveStepCount', min: 1, max: 20, steps: 190),
+    DiscreteProperty(name: 'bowing', min: 0, max: 20, steps: 400),
+    DiscreteProperty(name: 'maxRandomnessOffset', min: 0, max: 20, steps: 50),
   ];
 
   static List<DiscreteProperty> fillerConfigProperties = [
-    DiscreteProperty(name: 'fillWeight', label: 'fillWeight', min: 0, max: 50, steps: 500),
-    DiscreteProperty(name: 'hachureAngle', label: 'hachureAngle', min: 0, max: 360, steps: 360),
-    DiscreteProperty(name: 'hachureGap', label: 'hachureGap', min: 0, max: 50, steps: 500),
-    DiscreteProperty(name: 'dashOffset', label: 'dashOffset', min: 0, max: 50, steps: 500),
-    DiscreteProperty(name: 'dashGap', label: 'dashGap', min: 0, max: 50, steps: 500),
-    DiscreteProperty(name: 'zigzagOffset', label: 'zigzagOffset', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'fillWeight', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'hachureAngle', min: 0, max: 360, steps: 360),
+    DiscreteProperty(name: 'hachureGap', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'dashOffset', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'dashGap', min: 0, max: 50, steps: 500),
+    DiscreteProperty(name: 'zigzagOffset', min: 0, max: 50, steps: 500),
   ];
 }
 
@@ -96,7 +95,7 @@ class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderSt
     fillerConfigValues['zigzagOffset'] = FillerConfig.defaultConfig.zigzagOffset;
     fillerType = _fillers.keys.elementAt(0);
     _tabController = TabController(
-      length: 3,
+      length: 2,
       initialIndex: 0,
       vsync: this,
     );
@@ -147,7 +146,6 @@ class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderSt
           tabs: <Widget>[
             ConfigTab(label: 'Draw', iconData: Icons.border_color),
             ConfigTab(label: 'Filler', iconData: Icons.format_color_fill),
-            ConfigTab(label: 'Shape', iconData: Icons.format_shapes),
           ],
           onTap: (index) => setState(() => _tabController.index = index),
         ),
@@ -161,7 +159,7 @@ class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderSt
                 children: DiscreteProperty.drawConfigProperties
                     .map(
                       (property) => PropertySlider(
-                        label: property.label,
+                        label: property.name,
                         value: drawConfigValues[property.name],
                         min: property.min,
                         max: property.max,
@@ -193,7 +191,7 @@ class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderSt
                   ...DiscreteProperty.fillerConfigProperties
                       .map(
                         (property) => PropertySlider(
-                          label: property.label,
+                          label: property.name,
                           value: fillerConfigValues[property.name],
                           min: property.min,
                           max: property.max,
@@ -203,11 +201,6 @@ class _InteractiveBodyState extends State<InteractiveBody> with TickerProviderSt
                       )
                       .toList()
                 ],
-              ),
-              Container(
-                child: const Center(
-                  child: Text('ehllo'),
-                ),
               ),
             ],
           ),
