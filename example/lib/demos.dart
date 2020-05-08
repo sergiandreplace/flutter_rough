@@ -1,4 +1,5 @@
 import 'package:RoughExample/interactive_canvas.dart';
+import 'package:RoughExample/pages/decoration.dart';
 import 'package:flutter/material.dart';
 
 import 'interactive_examples.dart';
@@ -11,7 +12,7 @@ abstract class Demo {
 
   Demo(this.name, this.description, this.icon);
 
-  Widget buildPage();
+  Widget buildPage(BuildContext context);
 }
 
 class InteractiveDemo extends Demo {
@@ -20,8 +21,18 @@ class InteractiveDemo extends Demo {
   InteractiveDemo(String name, String description, this.exampleBuilder, Widget icon) : super(name, description, icon);
 
   @override
-  Widget buildPage() {
+  Widget buildPage(BuildContext context) {
     return ExamplePage(title: name, exampleBuilder: exampleBuilder);
+  }
+}
+
+class NormalDemo extends Demo {
+  final WidgetBuilder builder;
+  NormalDemo(String name, String description, this.builder, Widget icon) : super(name, description, icon);
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return builder(context);
   }
 }
 
@@ -53,4 +64,10 @@ final List<Demo> demos = [
     () => CurveExample(),
     const Icon(Icons.gesture, size: 36),
   ),
+  NormalDemo(
+    'Decoration demo',
+    'Create decorations with Rough',
+    (_) => DecorationExamplePage(),
+    const Icon(Icons.format_shapes, size: 36),
+  )
 ];
