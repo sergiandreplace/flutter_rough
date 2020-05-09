@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:rough/rough.dart';
+
 import 'config.dart';
 import 'core.dart';
 import 'entities.dart';
@@ -50,7 +52,7 @@ class FillerConfig {
     double zigzagOffset = 5,
   }) =>
       FillerConfig._(
-        drawConfig: drawConfig,
+        drawConfig: drawConfig ?? DrawConfig.build(),
         fillWeight: fillWeight,
         hachureAngle: hachureAngle,
         hachureGap: hachureGap,
@@ -84,15 +86,18 @@ class FillerConfig {
 }
 
 abstract class Filler {
-  final FillerConfig config;
+  FillerConfig _config;
 
-  Filler(this.config) : assert(config != null, 'FillerConfig could not be null');
+  Filler(FillerConfig config) {
+    _config = config ?? FillerConfig.defaultConfig;
+  }
 
   OpSet fill(List<PointD> points);
 
   List<Line> buildFillLines(List<PointD> points, FillerConfig config) {
+    final _config = config ?? FillerConfig.defaultConfig;
     final PointD rotationCenter = PointD(0, 0);
-    final double angle = (config.hachureAngle + 90).roundToDouble();
+    final double angle = (_config.hachureAngle + 90).roundToDouble();
     if (angle != 0) {
       // ignore: parameter_assignments
       points = rotatePoints(points, rotationCenter, angle);
@@ -111,7 +116,7 @@ abstract class Filler {
       vertices.add(vertices[0]);
     }
     if (vertices.length > 2) {
-      double gap = config.hachureGap;
+      double gap = _config.hachureGap;
       gap = max(gap, 0.1);
 
       final List<Edge> edges = createdSortedEdges(vertices);
@@ -310,7 +315,7 @@ class HachureFiller extends Filler {
 
   @override
   OpSet fill(List<PointD> points) {
-    return fillPolygon(points, config, false);
+    return fillPolygon(points, _config, false);
   }
 }
 
@@ -319,7 +324,7 @@ class ZigZagFiller extends Filler {
 
   @override
   OpSet fill(List<PointD> points) {
-    return fillPolygon(points, config, true);
+    return fillPolygon(points, _config, true);
   }
 }
 
@@ -328,8 +333,8 @@ class HatchFiller extends Filler {
 
   @override
   OpSet fill(List<PointD> points) {
-    final OpSet set1 = fillPolygon(points, config, false);
-    final FillerConfig rotated = config.copyWith(hachureAngle: config.hachureAngle + 90);
+    final OpSet set1 = fillPolygon(points, _config, false);
+    final FillerConfig rotated = _config.copyWith(hachureAngle: _config.hachureAngle + 90);
     final OpSet set2 = fillPolygon(points, rotated, false);
     return OpSet(type: OpSetType.fillSketch, ops: set1.ops + set2.ops);
   }
@@ -340,8 +345,8 @@ class DashedFiller extends Filler {
 
   @override
   OpSet fill(List<PointD> points) {
-    final List<Line> lines = buildFillLines(points, config);
-    return OpSet(type: OpSetType.fillSketch, ops: dashedLines(lines, config));
+    final List<Line> lines = buildFillLines(points, _config);
+    return OpSet(type: OpSetType.fillSketch, ops: dashedLines(lines, _config));
   }
 
   List<Op> dashedLines(List<Line> lines, FillerConfig config) {
@@ -384,8 +389,8 @@ class DotFiller extends Filler {
 
   @override
   OpSet fill(List<PointD> points) {
-    final FillerConfig dotConfig = config.copyWith(
-      drawConfig: config.drawConfig.copyWith(curveStepCount: 4, roughness: 1),
+    final FillerConfig dotConfig = _config.copyWith(
+      drawConfig: _config.drawConfig.copyWith(curveStepCount: 4, roughness: 1),
       hachureAngle: 1,
     );
     final List<Line> lines = buildFillLines(points, dotConfig);
@@ -423,12 +428,12 @@ class SolidFiller extends Filler {
   OpSet fill(List<PointD> points) {
     final List<Op> ops = [];
     if (points.isNotEmpty) {
-      final double offset = config.drawConfig.maxRandomnessOffset;
+      final double offset = _config.drawConfig.maxRandomnessOffset;
       final int len = points.length;
       if (len > 2) {
         ops.add(Op.move(PointD(
-          points[0].x + config.drawConfig.offsetSymmetric(offset),
-          points[0].y + config.drawConfig.offsetSymmetric(offset),
+          points[0].x + _config.drawConfig.offsetSymmetric(offset),
+          points[0].y + _config.drawConfig.offsetSymmetric(offset),
         )));
       }
     }

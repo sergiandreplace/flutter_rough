@@ -55,7 +55,7 @@ class DemoRow extends StatelessWidget {
         onTap: () => Navigator.push<MaterialPageRoute>(
           context,
           MaterialPageRoute(
-            builder: (context) => demo.buildPage(context),
+            builder: demo.buildPage,
           ),
         ),
       ),

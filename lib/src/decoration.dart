@@ -6,37 +6,39 @@ import 'package:rough/rough.dart';
 
 import 'config.dart';
 
-class RoughDrawDecoration {
+class RoughDrawStyle {
   final double width;
   final Color color;
   final Gradient gradient;
   final BlendMode blendMode;
 
-//    this.backgroundBlendMode,
-
-//    this.image,
-//    this.border,
-//    this.borderRadius,
+  // TODO: final BorderRadius borderRadius;
 //    this.boxShadow,
-  const RoughDrawDecoration({
+  const RoughDrawStyle({
     this.width,
     this.color,
     this.gradient,
     this.blendMode,
+    // TODO:this.borderRadius,
   });
 }
 
 class RoughDecoration extends Decoration {
   final BoxShape shape;
-  final RoughDrawDecoration roughDrawDecoration;
-
+  final RoughDrawStyle borderStyle;
+  final DrawConfig drawConfig;
+  final RoughDrawStyle fillStyle;
+  final Filler filler;
   const RoughDecoration({
-    this.roughDrawDecoration,
+    this.borderStyle,
+    this.drawConfig,
+    this.fillStyle,
     this.shape = BoxShape.rectangle,
+    this.filler,
   }) : assert(shape != null);
 
   @override
-  EdgeInsetsGeometry get padding => EdgeInsets.all(max(0.1, (roughDrawDecoration?.width ?? 0.1) / 2));
+  EdgeInsetsGeometry get padding => EdgeInsets.all(max(0.1, (borderStyle?.width ?? 0.1) / 2));
 
   @override
   BoxPainter createBoxPainter([VoidCallback onChanged]) {
@@ -51,21 +53,17 @@ class RoughDecorationPainter extends BoxPainter {
     this.roughDecoration,
   ) : assert(roughDecoration != null);
 
-  final Paint fillPaint = Paint()
-    ..color = Colors.blue
-    ..style = PaintingStyle.stroke
-    ..isAntiAlias = true
-    ..strokeWidth = 1;
-
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
-    final DrawConfig drawConfig = DrawConfig.build();
-    final FillerConfig fillerConfig = FillerConfig.build(drawConfig: drawConfig);
-    final Filler filler = NoFiller(fillerConfig);
+    final DrawConfig drawConfig = roughDecoration.drawConfig ?? DrawConfig.defaultValues;
+    final Filler filler = roughDecoration.filler ?? NoFiller();
     final Generator generator = Generator(drawConfig, filler);
     final Rect rect = offset & configuration.size;
 
-    final Paint pathPaint = _buildDrawPaint(roughDecoration.roughDrawDecoration, rect);
+    final Paint borderPaint = _buildDrawPaint(roughDecoration.borderStyle, rect);
+
+    final Paint fillPaint = roughDecoration.fillStyle == null ? borderPaint : _buildDrawPaint(roughDecoration.fillStyle, rect);
+
     Drawable drawable;
     switch (roughDecoration.shape) {
       case BoxShape.rectangle:
@@ -78,10 +76,10 @@ class RoughDecorationPainter extends BoxPainter {
         drawable = generator.circle(centerX, centerY, diameter);
         break;
     }
-    canvas.drawRough(drawable, pathPaint, fillPaint);
+    canvas.drawRough(drawable, borderPaint, fillPaint);
   }
 
-  Paint _buildDrawPaint(RoughDrawDecoration roughDrawDecoration, Rect rect) {
+  Paint _buildDrawPaint(RoughDrawStyle roughDrawDecoration, Rect rect) {
     const defaultColor = Color(0x00000000);
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
