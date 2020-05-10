@@ -5,7 +5,7 @@ import 'entities.dart';
 
 /// This is the base Rough class for painting
 extension Rough on Canvas {
-  void _drawToContext(OpSet drawing, Paint paint) {
+  Path _drawToContext(OpSet drawing) {
     final Path path = Path();
     for (final Op op in drawing.ops) {
       final data = op.data;
@@ -21,7 +21,7 @@ extension Rough on Canvas {
           break;
       }
     }
-    drawPath(path, paint);
+    return path;
   }
 
   /// Draws a rough Drawable
@@ -31,13 +31,16 @@ extension Rough on Canvas {
     for (final OpSet drawing in drawable.sets ?? []) {
       switch (drawing.type) {
         case OpSetType.path:
-          _drawToContext(drawing, pathPaint);
+          drawPath(_drawToContext(drawing), pathPaint);
+          ;
           break;
         case OpSetType.fillPath:
-          _drawToContext(drawing, fillPaint);
+          Paint _fillPaint = fillPaint..style = PaintingStyle.fill;
+          Path _path = _drawToContext(drawing)..close();
+          drawPath(_path, _fillPaint);
           break;
         case OpSetType.fillSketch:
-          _drawToContext(drawing, fillPaint);
+          drawPath(_drawToContext(drawing), fillPaint);
           break;
       }
     }

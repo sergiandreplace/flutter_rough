@@ -1,9 +1,9 @@
 import 'package:RoughExample/interactive_canvas.dart';
-import 'package:RoughExample/pages/decoration.dart';
+import 'package:RoughExample/pages/decoration_page.dart';
 import 'package:flutter/material.dart';
 
 import 'interactive_examples.dart';
-import 'pages/example.dart';
+import 'pages/interactive_example_page.dart';
 
 abstract class Demo {
   final String name;

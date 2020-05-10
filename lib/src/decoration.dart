@@ -6,34 +6,54 @@ import 'package:rough/rough.dart';
 
 import 'config.dart';
 
-class RoughDrawStyle {
+class RoughDrawingStyle {
   final double width;
   final Color color;
   final Gradient gradient;
   final BlendMode blendMode;
-
   // TODO: final BorderRadius borderRadius;
-//    this.boxShadow,
-  const RoughDrawStyle({
+  // TODO:   this.boxShadow?,
+
+  const RoughDrawingStyle({
     this.width,
     this.color,
     this.gradient,
     this.blendMode,
-    // TODO:this.borderRadius,
   });
 }
 
-class RoughDecoration extends Decoration {
-  final BoxShape shape;
-  final RoughDrawStyle borderStyle;
+/// The shape to use when rendering a [RoughBoxDecoration].
+///
+enum RoughBoxShape {
+  /// An axis-aligned, 2D rectangle. May have rounded corners (described by a
+  /// [BorderRadius]). The center of edges of the rectangle will match the
+  /// edges of the box into which the [RoughBoxDecoration] is painted.
+  rectangle,
+
+  /// A circle centered in the middle of the box into which the [Border] or
+  /// [BoxDecoration] is painted. The diameter of the circle is the shortest
+  /// dimension of the box, either the width or the height, such that the circle
+  /// path center touches the edges of the box.
+  circle,
+
+  /// An ellipse centered in the middle of the box into which the [Border] or
+  /// [BoxDecoration] is painted. The horizontal diameter of the ellipse is the width
+  /// the box and the vertical diameter is the height of the box, such that the ellipse
+  /// path center touches the edges of the box.
+  ellipse,
+}
+
+class RoughBoxDecoration extends Decoration {
+  final RoughBoxShape shape;
+  final RoughDrawingStyle borderStyle;
   final DrawConfig drawConfig;
-  final RoughDrawStyle fillStyle;
+  final RoughDrawingStyle fillStyle;
   final Filler filler;
-  const RoughDecoration({
+  const RoughBoxDecoration({
     this.borderStyle,
     this.drawConfig,
     this.fillStyle,
-    this.shape = BoxShape.rectangle,
+    this.shape = RoughBoxShape.rectangle,
     this.filler,
   }) : assert(shape != null);
 
@@ -47,7 +67,7 @@ class RoughDecoration extends Decoration {
 }
 
 class RoughDecorationPainter extends BoxPainter {
-  final RoughDecoration roughDecoration;
+  final RoughBoxDecoration roughDecoration;
 
   RoughDecorationPainter(
     this.roughDecoration,
@@ -66,20 +86,26 @@ class RoughDecorationPainter extends BoxPainter {
 
     Drawable drawable;
     switch (roughDecoration.shape) {
-      case BoxShape.rectangle:
+      case RoughBoxShape.rectangle:
         drawable = generator.rectangle(offset.dx, offset.dy, configuration.size.width, configuration.size.height);
         break;
-      case BoxShape.circle:
+      case RoughBoxShape.circle:
         final double centerX = offset.dx + configuration.size.width / 2;
         final double centerY = offset.dy + configuration.size.height / 2;
         final double diameter = configuration.size.shortestSide;
         drawable = generator.circle(centerX, centerY, diameter);
         break;
+      case RoughBoxShape.ellipse:
+        final double centerX = offset.dx + configuration.size.width / 2;
+        final double centerY = offset.dy + configuration.size.height / 2;
+
+        drawable = generator.ellipse(centerX, centerY, configuration.size.width, configuration.size.height);
+        break;
     }
     canvas.drawRough(drawable, borderPaint, fillPaint);
   }
 
-  Paint _buildDrawPaint(RoughDrawStyle roughDrawDecoration, Rect rect) {
+  Paint _buildDrawPaint(RoughDrawingStyle roughDrawDecoration, Rect rect) {
     const defaultColor = Color(0x00000000);
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
@@ -91,7 +117,6 @@ class RoughDecorationPainter extends BoxPainter {
     if (roughDrawDecoration?.blendMode != null) {
       paint.blendMode = roughDrawDecoration.blendMode;
     }
-
     return paint;
   }
 }
