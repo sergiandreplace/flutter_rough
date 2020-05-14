@@ -87,7 +87,7 @@ class OpSetBuilder {
 
   static OpSet ellipse(double x, double y, double width, double height, DrawConfig config) {
     final EllipseParams params = generateEllipseParams(width, height, config);
-    return ellipseWithParams(x, y, config, params).opSet;
+    return ellipseSet(x, y, config, params);
   }
 
   static OpSet buildPolygon(List<PointD> points, DrawConfig config) {
@@ -264,7 +264,7 @@ EllipseParams generateEllipseParams(double width, double height, DrawConfig conf
   return EllipseParams(increment: increment, rx: rx, ry: ry);
 }
 
-EllipseResult ellipseWithParams(double x, double y, DrawConfig config, EllipseParams ellipseParams) {
+EllipseResult ellipseWithParamsx(double x, double y, DrawConfig config, EllipseParams ellipseParams) {
   final ComputedEllipsePoints ellipsePoints1 = _computeEllipsePoints(
     increment: ellipseParams.increment,
     cx: x,
@@ -329,4 +329,81 @@ ComputedEllipsePoints _computeEllipsePoints({
       config.offsetSymmetric(offset) + cy + 0.9 * ry * sin(radOffset + overlap * 0.5),
     ));
   return ComputedEllipsePoints(corePoints: corePoints, allPoints: allPoints);
+}
+
+OpSet ellipseSet(double x, double y, DrawConfig config, EllipseParams ellipseParams) {
+  final List<PointD> ellipsePoints1 = computeEllipseAllPoints(
+    increment: ellipseParams.increment,
+    cx: x,
+    cy: y,
+    rx: ellipseParams.rx,
+    ry: ellipseParams.ry,
+    offset: 1,
+    overlap: ellipseParams.increment * config.offset(0.1, config.offset(0.4, 1)),
+    config: config,
+  );
+  final List<PointD> ellipsePoints2 = computeEllipseAllPoints(
+    increment: ellipseParams.increment,
+    cx: x,
+    cy: y,
+    rx: ellipseParams.rx,
+    ry: ellipseParams.ry,
+    offset: 1.5,
+    overlap: 0,
+    config: config,
+  );
+  final List<Op> o1 = OpsGenerator.curve(ellipsePoints1, config);
+  final List<Op> o2 = OpsGenerator.curve(ellipsePoints2, config);
+  return OpSet(type: OpSetType.path, ops: o1 + o2);
+}
+
+List<PointD> ellipseEstimated(double x, double y, DrawConfig config, EllipseParams ellipseParams) {
+  final List<PointD> corePoints = [];
+  final double radOffset = config.offsetSymmetric(0.5) - pi / 2;
+  for (double angle = radOffset; angle < (pi * 2 + radOffset - 0.01); angle = angle + ellipseParams.increment) {
+    final PointD p = PointD(
+      config.offsetSymmetric(1) + x + ellipseParams.rx * cos(angle),
+      config.offsetSymmetric(1) + y + ellipseParams.ry * sin(angle),
+    );
+    corePoints.add(p);
+  }
+  return corePoints;
+}
+
+List<PointD> computeEllipseAllPoints({
+  double increment,
+  double cx,
+  double cy,
+  double rx,
+  double ry,
+  double offset,
+  double overlap,
+  DrawConfig config,
+}) {
+  final List<PointD> allPoints = [];
+  final double radOffset = config.offsetSymmetric(0.5) - pi / 2;
+  allPoints.add(PointD(
+    config.offsetSymmetric(offset) + cx + 0.9 * rx * cos(radOffset - increment),
+    config.offsetSymmetric(offset) + cy + 0.9 * ry * sin(radOffset - increment),
+  ));
+  for (double angle = radOffset; angle < (pi * 2 + radOffset - 0.01); angle = angle + increment) {
+    allPoints.add(PointD(
+      config.offsetSymmetric(offset) + cx + rx * cos(angle),
+      config.offsetSymmetric(offset) + cy + ry * sin(angle),
+    ));
+  }
+  allPoints
+    ..add(PointD(
+      config.offsetSymmetric(offset) + cx + rx * cos(radOffset + pi * 2 + overlap * 0.5),
+      config.offsetSymmetric(offset) + cy + ry * sin(radOffset + pi * 2 + overlap * 0.5),
+    ))
+    ..add(PointD(
+      config.offsetSymmetric(offset) + cx + 0.98 * rx * cos(radOffset + overlap),
+      config.offsetSymmetric(offset) + cy + 0.98 * ry * sin(radOffset + overlap),
+    ))
+    ..add(PointD(
+      config.offsetSymmetric(offset) + cx + 0.9 * rx * cos(radOffset + overlap * 0.5),
+      config.offsetSymmetric(offset) + cy + 0.9 * ry * sin(radOffset + overlap * 0.5),
+    ));
+  return allPoints;
 }

@@ -38,8 +38,18 @@ class Generator {
   ///Draws a rectangle with the center at ([x], [y]) with the specified [width] and [height].
   Drawable ellipse(double x, double y, double width, double height) {
     final EllipseParams ellipseParams = generateEllipseParams(width, height, drawConfig);
-    final EllipseResult ellipseResponse = ellipseWithParams(x, y, drawConfig, ellipseParams);
-    return _buildDrawable(ellipseResponse.opSet, ellipseResponse.estimatedPoints);
+    final OpSet ellipse = ellipseSet(x, y, drawConfig, ellipseParams);
+    final List<PointD> estimatedPoints = computeEllipseAllPoints(
+      increment: ellipseParams.increment,
+      cx: x,
+      cy: y,
+      rx: ellipseParams.rx,
+      ry: ellipseParams.ry,
+      offset: 0,
+      overlap: 0,
+      config: drawConfig,
+    ); //ellipseEstimated(x, y, drawConfig, ellipseParams);
+    return _buildDrawable(ellipse, estimatedPoints);
   }
 
   ///Draws a rectangle with the center at ([x], [y]) with the specified [diameter].

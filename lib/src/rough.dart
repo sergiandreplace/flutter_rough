@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'core.dart';
@@ -32,11 +33,12 @@ extension Rough on Canvas {
       switch (drawing.type) {
         case OpSetType.path:
           drawPath(_drawToContext(drawing), pathPaint);
-          ;
+
           break;
         case OpSetType.fillPath:
-          Paint _fillPaint = fillPaint..style = PaintingStyle.fill;
-          Path _path = _drawToContext(drawing)..close();
+          final Paint _fillPaint = fillPaint;
+          _fillPaint.style = PaintingStyle.fill;
+          final Path _path = _drawToContext(drawing)..close();
           drawPath(_path, _fillPaint);
           break;
         case OpSetType.fillSketch:

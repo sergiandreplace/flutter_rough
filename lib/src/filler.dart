@@ -426,17 +426,16 @@ class SolidFiller extends Filler {
 
   @override
   OpSet fill(List<PointD> points) {
-    final List<Op> ops = [];
-    if (points.isNotEmpty) {
-      final double offset = _config.drawConfig.maxRandomnessOffset;
-      final int len = points.length;
-      if (len > 2) {
-        ops.add(Op.move(PointD(
-          points[0].x + _config.drawConfig.offsetSymmetric(offset),
-          points[0].y + _config.drawConfig.offsetSymmetric(offset),
-        )));
-      }
+    List<PointD> result = [];
+    if (points.length > 2) {
+      result = points
+          .map((point) => PointD(
+                point.x + _config.drawConfig.offsetSymmetric(_config.fillWeight),
+                point.y + _config.drawConfig.offsetSymmetric(_config.fillWeight),
+              ))
+          .toList();
+      result..add(result.first)..add(result[1])..add(result[2]);
     }
-    return OpSet(type: OpSetType.fillPath, ops: ops);
+    return OpSet(type: OpSetType.fillPath, ops: OpsGenerator.curve(result, _config.drawConfig));
   }
 }
