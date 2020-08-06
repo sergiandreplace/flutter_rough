@@ -37,7 +37,7 @@ DrawConfig myDrawConfig = DrawConfig.build(
 );
 
 //Create a `Filler` with a configuration (we reuse the drawConfig in this case).
-FillerConfig myFillerConfig = FillerConfig(
+FillerConfig myFillerConfig = FillerConfig.build(
     hachureGap: 8,
     hachureAngle: -20,
     drawConfig: myDrawConfig,
